@@ -1,6 +1,6 @@
-import './App.css';
 import './style/reset.css';
 import './style/pretendardvariable.css';
+import '@/style/theme.css.ts';
 import Router from './routes';
 import { Provider } from 'jotai';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
