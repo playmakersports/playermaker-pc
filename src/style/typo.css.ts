@@ -44,3 +44,8 @@ function buildFontVariants() {
 }
 
 export const fonts = buildFontVariants();
+export const align = styleVariants({
+  left: { textAlign: 'left' },
+  center: { textAlign: 'center' },
+  right: { textAlign: 'right' },
+});

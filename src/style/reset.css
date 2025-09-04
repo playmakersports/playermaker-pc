@@ -120,12 +120,18 @@ q {
     quotes: none;
 }
 
+a,
+input,
 button,
-a {
-    text-decoration: none;
+textarea,
+select,
+option {
+    background: none;
     border: none;
     outline: none;
     color: inherit;
+    border-radius: 0;
+    text-decoration: none;
 }
 
 blockquote:before,
