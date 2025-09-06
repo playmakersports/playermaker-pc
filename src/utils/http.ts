@@ -38,9 +38,14 @@ export type HttpRequestMethod = 'get' | 'post' | 'patch' | 'put' | 'delete';
  */
 class Http {
   private readonly baseURL: string;
+  private errorHandler?: (error: HttpError) => void;
 
   constructor(baseURL?: string) {
     this.baseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+  }
+
+  setErrorHandler(handler: (error: HttpError) => void) {
+    this.errorHandler = handler;
   }
   async get<T>(path: string, options?: Omit<HttpRequestOptions, 'json'>): Promise<T> {
     return await this.request('get', path, options);
@@ -72,7 +77,13 @@ class Http {
     }
 
     const errorData = await resp.json().catch(() => null);
-    throw new HttpError(resp.status, errorData);
+    const error = new HttpError(resp.status, errorData);
+    
+    if (this.errorHandler) {
+      this.errorHandler(error);
+    }
+    
+    throw error;
   }
 
   private parseRequestOptions(method: HttpRequestMethod, path: string, options: HttpRequestOptions = {}) {
