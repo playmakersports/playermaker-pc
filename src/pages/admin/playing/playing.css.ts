@@ -1,0 +1,252 @@
+import { createVar, globalStyle, style, styleVariants } from '@vanilla-extract/css';
+import { theme } from '@/style/theme.css.ts';
+import { fonts } from '@/style/typo.css.ts';
+
+const centerWidthVar = createVar();
+const pageSection = style({
+  display: 'flex',
+  gap: '20px',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  padding: '16px',
+  height: '100vh',
+  vars: {
+    [centerWidthVar]: 'max(140px, 20vw)',
+  },
+});
+const layoutContainer = style({
+  display: 'flex',
+  gap: '16px',
+  justifyContent: 'space-between',
+});
+const headerCenter = style([
+  fonts.head4.semibold,
+  {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    width: centerWidthVar,
+    textAlign: 'center',
+    fontFeatureSettings: `'cv02', 'cv04', 'cv06', 'cv09', 'cv13'`,
+  },
+]);
+const playingScore = style([
+  fonts.head6.semibold,
+  {
+    padding: '8px 10px',
+    border: `2px solid ${theme.color.gray['300']}`,
+    color: theme.color.gray['700'],
+    borderRadius: '10px',
+    textAlign: 'center',
+    fontVariant: 'tabular-nums',
+    letterSpacing: '-0.7px',
+  },
+]);
+const playingTimeout = style({
+  backgroundColor: theme.color.red['500'],
+  color: theme.color.white,
+  borderColor: 'transparent',
+});
+const headerTeam = style([
+  fonts.head6.medium,
+  {
+    flex: 1,
+    textAlign: 'center',
+  },
+]);
+
+const headerTeamFouls = style({
+  display: 'flex',
+  marginTop: '4px',
+  justifyContent: 'center',
+  gap: '4px',
+});
+globalStyle(`ul.${headerTeamFouls} > li`, {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '32px',
+  height: '32px',
+  backgroundColor: theme.color.gray['200'],
+  color: theme.color.gray['400'],
+  borderRadius: '2px',
+});
+globalStyle(`ul.${headerTeamFouls} > li`, {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '32px',
+  height: '32px',
+  backgroundColor: theme.color.gray['200'],
+  color: theme.color.gray['300'],
+  borderRadius: '2px',
+  '&[data-active="true"]': {
+    backgroundColor: theme.color.red['500'],
+    color: theme.color.white,
+  },
+});
+
+const controlCards = style({
+  display: 'flex',
+  flex: 1,
+  flexDirection: 'column',
+  gap: '10px',
+});
+const playingScoreTable = style({
+  position: 'relative',
+  width: centerWidthVar,
+  height: '77vh',
+  border: `1px solid ${theme.color.gray['300']}`,
+  borderRadius: '8px',
+  overflow: 'auto',
+});
+
+const scoreTableHeader = style([
+  fonts.body3.semibold,
+  {
+    position: 'sticky',
+    top: 0,
+    padding: '6px 0',
+    display: 'flex',
+    justifyContent: 'space-around',
+    backgroundColor: theme.color.gray['100'],
+    borderBottom: `1px solid ${theme.color.gray['300']}`,
+    textAlign: 'center',
+  },
+]);
+
+const scoreTableCell = style([
+  fonts.body2.regular,
+  {
+    borderBottom: `1px solid ${theme.color.gray['200']}`,
+    textAlign: 'center',
+    minHeight: '36px',
+    display: 'grid',
+    gridTemplateColumns: '1fr auto auto 1fr',
+    alignItems: 'center',
+  },
+]);
+const scoreTablePointCell = style([
+  fonts.body3.semibold,
+  {
+    padding: '6px 0',
+    minWidth: '40px',
+    backgroundColor: theme.color.gray['50'],
+    color: theme.color.gray['600'],
+    borderLeft: `1px solid ${theme.color.gray['200']}`,
+    fontFeatureSettings: `'cv02', 'cv04', 'cv06', 'cv09', 'cv13'`,
+    selectors: {
+      '&:nth-child(3)': {
+        borderRight: `1px solid ${theme.color.gray['200']}`,
+      },
+    },
+  },
+]);
+
+const playersList = style({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 1fr)',
+  borderRadius: '8px',
+  gap: '8px',
+});
+const actionsList = style({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 1fr)',
+  borderRadius: '8px',
+  gap: '8px',
+});
+const playerButton = style([
+  fonts.head6.medium,
+  {
+    display: 'flex',
+    padding: '20px 0',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.color.info['100'],
+    borderRadius: '6px',
+    cursor: 'pointer',
+    textAlign: 'center',
+    selectors: {
+      '&:hover': {
+        backgroundColor: theme.color.info['200'],
+      },
+      '&:active': {
+        backgroundColor: theme.color.info['300'],
+      },
+      '&[data-selected="true"]': {
+        backgroundColor: theme.color.info['600'],
+        color: theme.color.white,
+        border: `2px solid ${theme.color.white}`,
+        outline: `2px solid ${theme.color.info['600']}`,
+      },
+    },
+  },
+]);
+const actionButton = style([
+  fonts.body1.medium,
+  {
+    padding: '10px 0',
+    backgroundColor: theme.color.primary['200'],
+    borderRadius: '6px',
+    cursor: 'pointer',
+    textAlign: 'center',
+    selectors: {
+      '&:hover': {
+        backgroundColor: theme.color.primary['300'],
+      },
+      '&:active': {
+        backgroundColor: theme.color.primary['400'],
+      },
+      '&[data-selected="true"]': {
+        backgroundColor: theme.color.primary['600'],
+        color: theme.color.white,
+        border: `2px solid ${theme.color.white}`,
+        outline: `2px solid ${theme.color.primary['600']}`,
+      },
+    },
+  },
+]);
+
+const buttonBase = style([
+  fonts.head5.medium,
+  {
+    padding: '8px 10px',
+    color: theme.color.white,
+    borderRadius: '8px',
+    cursor: 'pointer',
+    border: 'none',
+  },
+]);
+
+const button = styleVariants({
+  primary: [buttonBase, { backgroundColor: theme.color.primary['500'] }],
+  success: [buttonBase, { backgroundColor: theme.color.success['500'] }],
+  info: [buttonBase, { backgroundColor: theme.color.info['500'] }],
+  warning: [buttonBase, { backgroundColor: theme.color.warning['500'] }],
+  red: [buttonBase, { backgroundColor: theme.color.red['500'] }],
+  purple: [buttonBase, { backgroundColor: theme.color.purple['500'] }],
+  magenta: [buttonBase, { backgroundColor: theme.color.magenta['500'] }],
+  gray: [buttonBase, { backgroundColor: theme.color.gray['500'] }],
+});
+
+export const playingStyle = {
+  pageSection,
+  layoutContainer,
+  playingScore,
+  playingTimeout,
+  headerTeam,
+  headerCenter,
+  headerTeamFouls,
+  controlCards,
+  playingScoreTable,
+  scoreTablePointCell,
+  scoreTableHeader,
+  scoreTableCell,
+  actionsList,
+  playersList,
+  playerButton,
+  actionButton,
+  button,
+};
