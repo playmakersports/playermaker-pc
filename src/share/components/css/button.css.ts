@@ -18,10 +18,11 @@ const buttonBase = style({
     '&:disabled': {
       cursor: 'not-allowed',
     },
-    // '&:active > span': {
-    //   transform: 'scale(0.95)',
-    //   transition: 'all 0.25s',
-    // },
+    '&:active': {
+      filter: 'brightness(0.95)',
+      transform: 'scale(0.97)',
+      transition: 'all 0.25s',
+    },
   },
 });
 

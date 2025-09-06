@@ -13,6 +13,10 @@ export const flexs = recipe({
       start: { justifyContent: 'flex-start' },
       end: { justifyContent: 'flex-end' },
     },
+    align: {
+      start: { alignItems: 'flex-start' },
+      end: { alignItems: 'flex-end' },
+    },
     dir: {
       row: { flexDirection: 'row' },
       col: { flexDirection: 'column' },
