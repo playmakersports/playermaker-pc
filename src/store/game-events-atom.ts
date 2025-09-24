@@ -1,13 +1,11 @@
 import { atom } from 'jotai';
-import { type PlayingActionType } from '@/share/enums/playing.ts';
+import { type PlayingActionType } from '@/enums/playing.ts';
 
 export interface GameEvent {
-  id: string;
-  playerId: number;
+  playerId: number | null;
   actionType: PlayingActionType;
+  teamType: 'home' | 'away' | null;
   timestamp: number;
-  quarter?: number;
-  teamId: 'home' | 'away';
 }
 
 export interface TimerState {
@@ -23,11 +21,10 @@ export const timerAtom = atom<TimerState>({
   pausedTime: 0,
 });
 
-export const addEventAtom = atom(null, (get, set, event: Omit<GameEvent, 'id' | 'timestamp'>) => {
+export const addEventAtom = atom(null, (get, set, event: Omit<GameEvent, 'timestamp'>) => {
   const events = get(gameEventsAtom);
   const newEvent: GameEvent = {
     ...event,
-    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     timestamp: Date.now(),
   };
   set(gameEventsAtom, [...events, newEvent]);
