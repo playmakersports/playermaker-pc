@@ -12,6 +12,7 @@ export const flexs = recipe({
       spb: { justifyContent: 'space-between' },
       start: { justifyContent: 'flex-start' },
       end: { justifyContent: 'flex-end' },
+      around: { justifyContent: 'space-around' },
     },
     align: {
       start: { alignItems: 'flex-start' },

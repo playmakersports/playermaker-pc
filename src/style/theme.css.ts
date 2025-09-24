@@ -1,5 +1,9 @@
 import { createGlobalTheme } from '@vanilla-extract/css';
 
+export const layout = createGlobalTheme(':root', {
+  headerHeight: '60px',
+});
+
 export const theme = createGlobalTheme(':root', {
   shadow: {
     xs: '0 1px 6px 0 rgba(15, 23, 42, 0.05)',
