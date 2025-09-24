@@ -13,6 +13,14 @@ export const PlayingActionEnums = {
   TF_FOUL: 'TF',
   PLAYER_IN: 'IN',
   PLAYER_OUT: 'OUT',
+  Q1_START: '1S',
+  Q1_END: '1E',
+  Q2_START: '2S',
+  Q2_END: '2E',
+  Q3_START: '3S',
+  Q3_END: '3E',
+  Q4_START: '4S',
+  Q4_END: '4E',
 } as const;
 
 export type PlayingActionType = (typeof PlayingActionEnums)[keyof typeof PlayingActionEnums];
