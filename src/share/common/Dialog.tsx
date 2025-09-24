@@ -6,7 +6,7 @@ import Button from '@/share/components/Button.tsx';
 
 type AlertBaseProps = ComponentProps<OverlayControllerComponent>;
 type ConfirmBaseProps = ComponentProps<OverlayAsyncControllerComponent<boolean>>;
-type DialogCommon = {
+export type DialogCommon = {
   title: string;
   contents?: string;
 };

@@ -20,20 +20,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 }
 
 const BaseInput = (props: InputProps & { ref?: React.Ref<HTMLInputElement> }) => {
-  const {
-    title,
-    iconType,
-    error = false,
-    delButton = false,
-    onButtonClick,
-    required,
-    information,
-    description,
-    suffix,
-    large = false,
-    ref,
-    ...rest
-  } = props;
+  const { title, onButtonClick, ref, ...rest } = props;
 
   const internalRef = useRef<HTMLInputElement>(null);
   useImperativeHandle(ref, () => internalRef.current as HTMLInputElement);
@@ -52,7 +39,7 @@ const BaseInput = (props: InputProps & { ref?: React.Ref<HTMLInputElement> }) =>
   };
 
   return (
-    <InputWrapper title={title} required={required}>
+    <InputWrapper title={title} required={props.required}>
       {onButtonClick ? (
         <div className={inputStyle.innerBox} onClick={onButtonClick}>
           <input ref={internalRef} className={inputStyle.base} readOnly={true} {...rest} />

@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { fonts, fontWeight } from '@/style/typo.css.ts';
-import { theme } from '@/style/theme.css.ts';
+import { layout, theme } from '@/style/theme.css.ts';
 
 const adminRoot = style({
   margin: '0 auto',
@@ -17,7 +17,7 @@ const main = style({
 });
 const navContainer = style({
   width: '100%',
-  height: '60px',
+  height: layout.headerHeight,
   borderBottom: `1px solid ${theme.color.gray['100']}`,
 });
 const navInner = style({
