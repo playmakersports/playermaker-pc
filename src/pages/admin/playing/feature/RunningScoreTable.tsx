@@ -10,7 +10,7 @@ type Props = {
 function RunningScoreTable(props: Props) {
   const { maxScore, scores } = props;
   const tableRef = useRef<HTMLUListElement>(null);
-  const renderMaxScore = maxScore < 20 ? 20 : maxScore + 4;
+  const renderMaxScore = Math.max(20, maxScore + 4);
 
   const homePlayersByScore: { [score: number]: number } = {};
   const awayPlayersByScore: { [score: number]: number } = {};
@@ -21,10 +21,10 @@ function RunningScoreTable(props: Props) {
   scores.forEach(event => {
     const points = Number(event.actionType);
     if (points && !isNaN(points)) {
-      if (event.teamId === 'home') {
+      if (event.teamType === 'home') {
         homeRunningScore += points;
         homePlayersByScore[homeRunningScore] = event.playerNo;
-      } else if (event.teamId === 'away') {
+      } else if (event.teamType === 'away') {
         awayRunningScore += points;
         awayPlayersByScore[awayRunningScore] = event.playerNo;
       }

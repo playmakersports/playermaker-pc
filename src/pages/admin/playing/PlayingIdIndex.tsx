@@ -6,114 +6,73 @@ import { groupBy, mapValues, sumBy } from 'es-toolkit';
 
 import { fonts } from '@/style/typo.css.ts';
 import { playingStyle as style } from '@/pages/admin/playing/playing.css.ts';
-import { addEventAtom, gameEventsAtom, timerAtom } from '@/store/game-events-atom.ts';
+import { addEventAtom, gameEventsAtom, pausedEventsAtom, timerAtom } from '@/store/game-events-atom.ts';
 import RunningScoreTable from '@/pages/admin/playing/feature/RunningScoreTable.tsx';
-import { PlayingActionEnums, type PlayingActionType } from '@/share/enums/playing.ts';
+import { type PlayingActionType } from '@/enums/playing.ts';
+import { useGetMatchInfo } from '@/query/match.ts';
+import { flexs } from '@/style/container.css.ts';
+import { timestampToTimerMS } from '@/share/libs/format.ts';
+import TeamActionController from '@/pages/admin/playing/feature/TeamActionController.tsx';
+import { useSetAtom } from 'jotai/index';
 
 function PlayingIdIndex() {
   const { matchId } = useParams<{ matchId: string }>();
-  const [selected, setSelected] = useState<Selected>({
-    playerId: null,
-    actionType: null,
-  });
+
   const [gameEvents] = useAtom(gameEventsAtom);
+  const setPausedEvents = useSetAtom(pausedEventsAtom);
   const [, addEvent] = useAtom(addEventAtom);
   const [timer, setTimer] = useAtom(timerAtom);
   const [currentTime, setCurrentTime] = useState(0);
-  const PLAYERS = [
-    { playerId: 123, playerName: '김지훈', playerNo: 1, teamId: 'home' },
-    { playerId: 1223, playerName: '이지훈', playerNo: 21, teamId: 'home' },
-    { playerId: 1423, playerName: '박지훈', playerNo: 7, teamId: 'home' },
-    { playerId: 7123, playerName: '최지훈', playerNo: 9, teamId: 'home' },
-    { playerId: 6723, playerName: '공지훈', playerNo: 11, teamId: 'home' },
-    { playerId: 3100, playerName: '홍민지', playerNo: 3, teamId: 'away' },
-    { playerId: 2100, playerName: '김민지', playerNo: 31, teamId: 'away' },
-    { playerId: 660, playerName: '박민지', playerNo: 8, teamId: 'away' },
-    { playerId: 60, playerName: '송민지', playerNo: 5, teamId: 'away' },
-    { playerId: 70, playerName: '안민지', playerNo: 12, teamId: 'away' },
-  ];
-  const ACTIONS = [
-    { type: PlayingActionEnums.POINT1, name: '1점' },
-    { type: PlayingActionEnums.POINT2, name: '2점' },
-    { type: PlayingActionEnums.POINT3, name: '3점' },
-    { type: PlayingActionEnums.ATTACK_REBOUND, name: '공격리바' },
-    { type: PlayingActionEnums.DEFENCE_REBOUND, name: '수비리바' },
-    { type: PlayingActionEnums.BLOCK, name: '블락' },
-    { type: PlayingActionEnums.STEAL, name: '스틸' },
-    { type: PlayingActionEnums.TURNOVER, name: '턴오버' },
-    { type: null, name: null },
-    { type: PlayingActionEnums.P_FOUL, name: '파울P' },
-    { type: PlayingActionEnums.OF_FOUL, name: '파울O' },
-    { type: PlayingActionEnums.TF_FOUL, name: '파울T' },
-  ];
+  const [quarter, setQuarter] = useState(1);
 
-  const handlePlayerSelect = (playerId: number) => {
-    setSelected(prev => ({ ...prev, playerId }));
-  };
+  const [playing, setPlaying] = useState<{ home: number[]; away: number[] }>({ home: [], away: [] });
 
-  const handleActionSelect = (actionType: PlayingActionType | null) => {
-    if (!actionType) return;
+  const { data } = useGetMatchInfo(Number(matchId));
+  const playerList = data?.playlists.map(player => ({
+    playerId: player.player.playerId,
+    playerName: player.player.name,
+    playerNo: player.player.number,
+    teamType: player.homeYn ? 'home' : 'away',
+  }));
 
-    setSelected(prev => ({ ...prev, actionType }));
-
-    if (selected.playerId && actionType) {
-      const player = PLAYERS.find(p => p.playerId === selected.playerId);
-      if (player) {
-        addEvent({
-          playerId: selected.playerId,
-          actionType,
-          teamId: player.teamId as 'home' | 'away',
-        });
-      }
+  useEffect(() => {
+    if (data) {
+      setPlaying({
+        home: data.playlists.filter(p => p.homeYn && p.starter).map(p => p.player.playerId),
+        away: data.playlists.filter(p => !p.homeYn && p.starter).map(p => p.player.playerId),
+      });
     }
-
-    setSelected({
-      playerId: null,
-      actionType: null,
-    });
-  };
+  }, [data]);
 
   const teamScores = () => {
     return mapValues(
       groupBy(
         gameEvents.filter(event => ['1', '2', '3'].includes(event.actionType)),
-        event => event.teamId,
+        event => event.teamType!,
       ),
       items => sumBy(items, event => Number(event.actionType)),
     );
   };
 
-  const playerFouls = useMemo(() => {
-    const personalFouls: Record<number, number> = {};
-    const technicalFouls: Record<number, number> = {};
-
-    gameEvents.forEach(event => {
-      if (event.actionType === PlayingActionEnums.P_FOUL || event.actionType === PlayingActionEnums.OF_FOUL) {
-        personalFouls[event.playerId] = (personalFouls[event.playerId] || 0) + 1;
-      } else if (event.actionType === PlayingActionEnums.TF_FOUL) {
-        technicalFouls[event.playerId] = (technicalFouls[event.playerId] || 0) + 1;
-      }
-    });
-
-    return { personalFouls, technicalFouls };
+  const teamFouls = useMemo(() => {
+    const { PF: personalFouls } = groupBy(gameEvents, event => event.actionType);
+    return groupBy(
+      (personalFouls ?? []).filter(f => f.quarter === quarter),
+      f => f.teamType!,
+    );
   }, [gameEvents]);
 
-  const teamFouls = useMemo(() => {
-    const homeFouls = gameEvents.filter(event => {
-      if (event.actionType !== PlayingActionEnums.P_FOUL) return false;
-      const player = PLAYERS.find(p => p.playerId === event.playerId);
-      return player?.teamId === 'home';
-    }).length;
-
-    const awayFouls = gameEvents.filter(event => {
-      if (event.actionType !== PlayingActionEnums.P_FOUL) return false;
-      const player = PLAYERS.find(p => p.playerId === event.playerId);
-      return player?.teamId === 'away';
-    }).length;
-
-    return { homeFouls, awayFouls };
-  }, [gameEvents, PLAYERS]);
-
+  const handleQuarterStart = () => {
+    if (timer.pausedTime === 0 && !timer.isRunning) {
+      addEvent({
+        playerId: null,
+        teamType: null,
+        actionType: `${quarter}S` as PlayingActionType,
+        quarter,
+      });
+    }
+    handleTimerToggle();
+  };
   const handleTimerToggle = () => {
     const now = Date.now();
 
@@ -125,6 +84,14 @@ function PlayingIdIndex() {
         startTimestamp: null,
         pausedTime: timer.pausedTime + currentElapsed,
       });
+      setPausedEvents(prev => [
+        ...prev,
+        {
+          timestamp: now,
+          type: 'start',
+          quarter,
+        },
+      ]);
     } else {
       // 타이머 시작
       setTimer({
@@ -132,14 +99,33 @@ function PlayingIdIndex() {
         startTimestamp: now,
         pausedTime: timer.pausedTime,
       });
+      setPausedEvents(prev => [
+        ...prev,
+        {
+          timestamp: now,
+          type: 'end',
+          quarter,
+        },
+      ]);
     }
   };
 
-  const formatTime = (milliseconds: number) => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  const handleQuarterEnd = () => {
+    if (timer.isRunning) {
+      handleTimerToggle();
+      setTimer({
+        isRunning: false,
+        startTimestamp: null,
+        pausedTime: 0,
+      });
+      addEvent({
+        playerId: null,
+        teamType: null,
+        actionType: `${quarter}E` as PlayingActionType,
+        quarter,
+      });
+      setQuarter(prev => prev + 1);
+    }
   };
 
   useEffect(() => {
@@ -181,148 +167,81 @@ function PlayingIdIndex() {
       <section className={style.pageSection} style={{ flex: 1 }}>
         <header className={style.layoutContainer}>
           <div className={style.headerTeam}>
-            <p>HOME 팀이름</p>
+            <p className={flexs({ gap: '4' })}>
+              <span className={style.teamTypeFlag}>HOME</span> {data?.recordMatchResponseDto.homeTeam.teamName}
+            </p>
             <ul className={style.headerTeamFouls}>
-              <li data-active={teamFouls.homeFouls >= 1}>1</li>
-              <li data-active={teamFouls.homeFouls >= 2}>2</li>
-              <li data-active={teamFouls.homeFouls >= 3}>3</li>
-              <li data-active={teamFouls.homeFouls >= 4}>4</li>
-              <li data-active={teamFouls.homeFouls >= 5}>5</li>
+              {[1, 2, 3, 4, 5].map(num => (
+                <li key={`home-fouls-${num}`} data-active={teamFouls.home?.length >= num}>
+                  {num}
+                </li>
+              ))}
             </ul>
           </div>
           <div className={style.headerCenter}>
             <div style={{ flex: 1 }}>{teamScores().home}</div>
             <div className={clsx(style.playingScore, { [style.playingTimeout]: !timer.isRunning })}>
-              1Q - <span className="time">{formatTime(currentTime)}</span>
+              {quarter}Q - <span className="time">{timestampToTimerMS(currentTime)}</span>
             </div>
             <div style={{ flex: 1 }}>{teamScores().away}</div>
           </div>
           <div className={style.headerTeam}>
-            <p>AWAY 팀이름</p>
+            <p className={flexs({ gap: '4' })}>
+              <span className={style.teamTypeFlag}>AWAY</span> {data?.recordMatchResponseDto.awayTeam.teamName}
+            </p>
             <ul className={style.headerTeamFouls}>
-              <li data-active={teamFouls.awayFouls >= 1}>1</li>
-              <li data-active={teamFouls.awayFouls >= 2}>2</li>
-              <li data-active={teamFouls.awayFouls >= 3}>3</li>
-              <li data-active={teamFouls.awayFouls >= 4}>4</li>
-              <li data-active={teamFouls.awayFouls >= 5}>5</li>
+              {[1, 2, 3, 4, 5].map(num => (
+                <li key={`away-fouls-${num}`} data-active={teamFouls.away?.length >= num}>
+                  {num}
+                </li>
+              ))}
             </ul>
           </div>
         </header>
         <div className={style.layoutContainer}>
           <div className={style.controlCards}>
-            <div className={style.playersList}>
-              {PLAYERS.filter(player => player.teamId === 'home').map(player => (
-                <button
-                  type="button"
-                  key={player.playerId}
-                  data-selected={selected.playerId === player.playerId}
-                  className={style.playerButton}
-                  onClick={() => handlePlayerSelect(player.playerId)}
-                >
-                  <span>{player.playerNo}</span>
-                  {player.playerName}{' '}
-                  {playerFouls.technicalFouls[player.playerId] >= 2 ? (
-                    <span style={{ color: 'red', fontWeight: 'bold' }}>아웃</span>
-                  ) : (
-                    <span>
-                      (
-                      {(playerFouls.personalFouls[player.playerId] || 0) +
-                        (playerFouls.technicalFouls[player.playerId] || 0)}
-                      )
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-            <div className={style.actionsList}>
-              {ACTIONS.map(action =>
-                action.type ? (
-                  <button
-                    type="button"
-                    key={action.type}
-                    data-selected={selected.actionType === action.type}
-                    className={style.actionButton}
-                    onClick={() => handleActionSelect(action.type)}
-                  >
-                    {action.name}
-                  </button>
-                ) : (
-                  <div></div>
-                ),
-              )}
-            </div>
+            <TeamActionController
+              teamType="home"
+              playerList={playerList ?? []}
+              playing={playing}
+              setPlaying={setPlaying}
+              matchId={Number(matchId)}
+              quarter={quarter}
+            />
           </div>
-          <RunningScoreTable
-            maxScore={Math.max(teamScores().home, teamScores().away)}
-            scores={gameEvents
-              .filter(event => ['1', '2', '3'].includes(event.actionType))
-              .map(event => ({
-                ...event,
-                playerNo: PLAYERS.find(p => p.playerId === event.playerId)?.playerNo || -1,
-              }))}
-          />
-          <div className={style.controlCards}>
-            <div className={style.playersList}>
-              {PLAYERS.filter(player => player.teamId === 'away').map(player => (
-                <button
-                  type="button"
-                  key={player.playerId}
-                  data-selected={selected.playerId === player.playerId}
-                  className={style.playerButton}
-                  onClick={() => handlePlayerSelect(player.playerId)}
-                >
-                  <span>{player.playerNo}</span>
-                  {player.playerName}{' '}
-                  {playerFouls.technicalFouls[player.playerId] >= 2 ? (
-                    <span style={{ color: 'red', fontWeight: 'bold' }}>아웃</span>
-                  ) : (
-                    <span>
-                      (
-                      {(playerFouls.personalFouls[player.playerId] || 0) +
-                        (playerFouls.technicalFouls[player.playerId] || 0)}
-                      )
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-            <div className={style.actionsList}>
-              {ACTIONS.map(action =>
-                action.type ? (
-                  <button
-                    type="button"
-                    key={action.type}
-                    data-selected={selected.actionType === action.type}
-                    className={style.actionButton}
-                    onClick={() => handleActionSelect(action.type)}
-                  >
-                    {action.name}
-                  </button>
-                ) : (
-                  <div></div>
-                ),
-              )}
-            </div>
-          </div>
-        </div>
-        <div className={style.layoutContainer}>
-          <div className="summary"></div>
           <div>
-            <button className={style.button.success}>쿼터 종료</button>
-            <button className={style.button.warning} onClick={handleTimerToggle}>
-              {timer.isRunning ? 'TIME OUT' : 'START'}
-            </button>
+            <RunningScoreTable
+              maxScore={Math.max(teamScores().home || 0, teamScores().away || 0)}
+              scores={gameEvents
+                .filter(event => ['1', '2', '3'].includes(event.actionType))
+                .map(event => ({
+                  ...event,
+                  playerNo: playerList?.find(p => p.playerId === event.playerId)?.playerNo || -1,
+                }))}
+            />
+            <div>
+              <button className={style.button.success} disabled={!timer.isRunning} onClick={handleQuarterEnd}>
+                쿼터 종료
+              </button>
+              <button className={style.button.warning} onClick={handleQuarterStart}>
+                {timer.isRunning ? 'TIME OUT' : 'START'}
+              </button>
+            </div>
           </div>
-          <div className="summary"></div>
+          <div className={style.controlCards}>
+            <TeamActionController
+              teamType="away"
+              playerList={playerList ?? []}
+              playing={playing}
+              setPlaying={setPlaying}
+              matchId={Number(matchId)}
+              quarter={quarter}
+            />
+          </div>
         </div>
       </section>
     </div>
   );
-}
-
-interface Selected {
-  playerId: number | null;
-  actionType: PlayingActionType | null;
 }
 
 export default PlayingIdIndex;

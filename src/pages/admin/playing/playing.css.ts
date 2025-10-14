@@ -5,13 +5,12 @@ import { fonts } from '@/style/typo.css.ts';
 const centerWidthVar = createVar();
 const pageSection = style({
   display: 'flex',
-  gap: '20px',
+  gap: '32px',
   flexDirection: 'column',
-  justifyContent: 'space-between',
   padding: '16px',
   height: '100vh',
   vars: {
-    [centerWidthVar]: 'max(140px, 20vw)',
+    [centerWidthVar]: 'max(140px, 16.5vw)',
   },
 });
 const layoutContainer = style({
@@ -34,13 +33,29 @@ const headerCenter = style([
 const playingScore = style([
   fonts.head6.semibold,
   {
-    padding: '8px 10px',
+    padding: '8px 0',
+    minWidth: '152px',
     border: `2px solid ${theme.color.gray['300']}`,
     color: theme.color.gray['700'],
     borderRadius: '10px',
     textAlign: 'center',
     fontVariant: 'tabular-nums',
     letterSpacing: '-0.7px',
+  },
+]);
+const teamTypeFlag = style([
+  fonts.body4.semibold,
+  {
+    padding: '2px 8px',
+    backgroundColor: theme.color.gray['500'],
+    borderRadius: '3px',
+    color: theme.color.white,
+  },
+]);
+const subNumberText = style([
+  fonts.head4.medium,
+  {
+    fontFeatureSettings: `'cv02', 'cv04', 'cv06', 'cv09', 'cv13'`,
   },
 ]);
 const playingTimeout = style({
@@ -159,8 +174,9 @@ const actionsList = style({
 const playerButton = style([
   fonts.head6.medium,
   {
+    userSelect: 'none',
     display: 'flex',
-    padding: '20px 0',
+    padding: '12px 0',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
@@ -175,7 +191,12 @@ const playerButton = style([
       '&:active': {
         backgroundColor: theme.color.info['300'],
       },
+      '&:disabled': {
+        backgroundColor: theme.color.gray['100'],
+        color: theme.color.gray['400'],
+      },
       '&[data-selected="true"]': {
+        padding: '10px 0',
         backgroundColor: theme.color.info['600'],
         color: theme.color.white,
         border: `2px solid ${theme.color.white}`,
@@ -187,7 +208,8 @@ const playerButton = style([
 const actionButton = style([
   fonts.body1.medium,
   {
-    padding: '10px 0',
+    userSelect: 'none',
+    padding: '16px 0',
     backgroundColor: theme.color.primary['200'],
     borderRadius: '6px',
     cursor: 'pointer',
@@ -199,7 +221,12 @@ const actionButton = style([
       '&:active': {
         backgroundColor: theme.color.primary['400'],
       },
+      '&:disabled': {
+        backgroundColor: theme.color.gray['100'],
+        color: theme.color.gray['400'],
+      },
       '&[data-selected="true"]': {
+        padding: '14px 0',
         backgroundColor: theme.color.primary['600'],
         color: theme.color.white,
         border: `2px solid ${theme.color.white}`,
@@ -208,6 +235,53 @@ const actionButton = style([
     },
   },
 ]);
+const playerChangeButton = style([
+  fonts.head6.medium,
+  {
+    userSelect: 'none',
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    gap: '12px',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    border: '1px solid',
+    borderColor: theme.color.gray['300'],
+    borderRadius: '6px',
+    cursor: 'pointer',
+    textAlign: 'center',
+    color: theme.color.gray['500'],
+    selectors: {
+      '&:hover': {
+        backgroundColor: theme.color.gray['50'],
+      },
+      '&:active': {
+        backgroundColor: theme.color.gray['200'],
+      },
+      '&:disabled': {
+        border: 'none',
+        backgroundColor: theme.color.gray['100'],
+        color: theme.color.gray['400'],
+      },
+    },
+  },
+]);
+
+const playerFoulCount = style({
+  display: 'inline-flex',
+  width: '16px',
+  height: '16px',
+  borderRadius: '50%',
+  border: '2px solid',
+  borderColor: theme.color.gray['400'],
+  selectors: {
+    '&[data-active="true"]': {
+      backgroundColor: theme.color.gray['600'],
+      borderColor: theme.color.gray['600'],
+    },
+  },
+});
 
 const buttonBase = style([
   fonts.head5.medium,
@@ -217,6 +291,13 @@ const buttonBase = style([
     borderRadius: '8px',
     cursor: 'pointer',
     border: 'none',
+    selectors: {
+      '&:disabled': {
+        backgroundColor: theme.color.gray['200'],
+        color: theme.color.gray['400'],
+        cursor: 'not-allowed',
+      },
+    },
   },
 ]);
 
@@ -235,6 +316,7 @@ export const playingStyle = {
   pageSection,
   layoutContainer,
   playingScore,
+  teamTypeFlag,
   playingTimeout,
   headerTeam,
   headerCenter,
@@ -246,6 +328,9 @@ export const playingStyle = {
   scoreTableCell,
   actionsList,
   playersList,
+  playerChangeButton,
+  playerFoulCount,
+  subNumberText,
   playerButton,
   actionButton,
   button,
