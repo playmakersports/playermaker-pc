@@ -1,13 +1,13 @@
 import { buttonStyles } from '@/share/components/css/button.css.ts';
 import * as React from 'react';
 
-export type ButtonStyleMode = 'primary' | 'gray' | 'success' | 'info' | 'warning' | 'red';
+export type ButtonThemeType = 'primary' | 'gray' | 'success' | 'info' | 'warning' | 'red';
 export type ButtonFillType = 'default' | 'light' | 'outline';
 type ButtonSizeType = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge';
 
 type Props = {
   fillType?: ButtonFillType;
-  mode?: ButtonStyleMode;
+  theme?: ButtonThemeType;
   children?: React.ReactNode;
   fullWidth?: boolean;
   type?: 'button' | 'submit' | 'reset' | undefined;
@@ -21,7 +21,7 @@ type Props = {
 function Button(props: Props) {
   const {
     fillType = 'default',
-    mode = 'primary',
+    theme = 'primary',
     children,
     fullWidth,
     type,
@@ -40,7 +40,7 @@ function Button(props: Props) {
       onClick={onClick}
       disabled={disabled}
       className={buttonStyles.recipes({
-        mode,
+        theme,
         fillType,
         size,
         fullWidth,

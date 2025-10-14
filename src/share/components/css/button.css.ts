@@ -4,6 +4,7 @@ import { fonts } from '@/style/typo.css.ts';
 import { theme } from '@/style/theme.css.ts';
 
 const buttonBase = style({
+  position: 'relative',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -29,7 +30,7 @@ const buttonBase = style({
 const recipes = recipe({
   base: buttonBase,
   variants: {
-    mode: {
+    theme: {
       primary: {},
       gray: {},
       success: {},
@@ -99,7 +100,7 @@ const recipes = recipe({
   },
   compoundVariants: [
     {
-      variants: { mode: 'primary', fillType: 'default' },
+      variants: { theme: 'primary', fillType: 'default' },
       style: {
         backgroundColor: theme.color.primary[500],
         color: theme.color.white,
@@ -114,7 +115,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'primary', fillType: 'light' },
+      variants: { theme: 'primary', fillType: 'light' },
       style: {
         backgroundColor: theme.color.primary[50],
         color: theme.color.primary[600],
@@ -129,7 +130,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'primary', fillType: 'outline' },
+      variants: { theme: 'primary', fillType: 'outline' },
       style: {
         backgroundColor: 'transparent',
         color: theme.color.primary[600],
@@ -147,7 +148,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'gray', fillType: 'default' },
+      variants: { theme: 'gray', fillType: 'default' },
       style: {
         backgroundColor: theme.color.gray[500],
         color: theme.color.white,
@@ -162,7 +163,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'gray', fillType: 'light' },
+      variants: { theme: 'gray', fillType: 'light' },
       style: {
         backgroundColor: theme.color.gray[100],
         color: theme.color.gray[600],
@@ -177,7 +178,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'gray', fillType: 'outline' },
+      variants: { theme: 'gray', fillType: 'outline' },
       style: {
         backgroundColor: theme.color.white,
         color: theme.color.gray[600],
@@ -196,7 +197,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'success', fillType: 'default' },
+      variants: { theme: 'success', fillType: 'default' },
       style: {
         backgroundColor: theme.color.success[500],
         color: theme.color.white,
@@ -211,7 +212,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'success', fillType: 'light' },
+      variants: { theme: 'success', fillType: 'light' },
       style: {
         backgroundColor: theme.color.success[50],
         color: theme.color.success[600],
@@ -226,7 +227,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'success', fillType: 'outline' },
+      variants: { theme: 'success', fillType: 'outline' },
       style: {
         backgroundColor: theme.color.white,
         color: theme.color.success[600],
@@ -245,7 +246,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'info', fillType: 'default' },
+      variants: { theme: 'info', fillType: 'default' },
       style: {
         backgroundColor: theme.color.info[500],
         color: theme.color.white,
@@ -260,7 +261,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'info', fillType: 'light' },
+      variants: { theme: 'info', fillType: 'light' },
       style: {
         backgroundColor: theme.color.info[50],
         color: theme.color.info[600],
@@ -275,7 +276,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'info', fillType: 'outline' },
+      variants: { theme: 'info', fillType: 'outline' },
       style: {
         backgroundColor: theme.color.white,
         color: theme.color.info[600],
@@ -293,7 +294,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'warning', fillType: 'default' },
+      variants: { theme: 'warning', fillType: 'default' },
       style: {
         backgroundColor: theme.color.warning[500],
         color: theme.color.white,
@@ -308,7 +309,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'warning', fillType: 'light' },
+      variants: { theme: 'warning', fillType: 'light' },
       style: {
         backgroundColor: theme.color.warning[50],
         color: theme.color.warning[600],
@@ -323,7 +324,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'warning', fillType: 'outline' },
+      variants: { theme: 'warning', fillType: 'outline' },
       style: {
         backgroundColor: theme.color.white,
         color: theme.color.warning[600],
@@ -341,7 +342,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'red', fillType: 'default' },
+      variants: { theme: 'red', fillType: 'default' },
       style: {
         backgroundColor: theme.color.red[500],
         color: theme.color.white,
@@ -356,7 +357,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'red', fillType: 'light' },
+      variants: { theme: 'red', fillType: 'light' },
       style: {
         backgroundColor: theme.color.red[50],
         color: theme.color.red[600],
@@ -371,7 +372,7 @@ const recipes = recipe({
       },
     },
     {
-      variants: { mode: 'red', fillType: 'outline' },
+      variants: { theme: 'red', fillType: 'outline' },
       style: {
         backgroundColor: theme.color.white,
         color: theme.color.red[600],
@@ -421,7 +422,7 @@ const recipes = recipe({
     },
   ],
   defaultVariants: {
-    mode: 'primary',
+    theme: 'primary',
     fillType: 'default',
     size: 'medium',
     fullWidth: false,
@@ -433,13 +434,6 @@ const content = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: '4px',
-  // selectors: {
-  //   '& svg': {
-  //     width: '100%',
-  //     height: 'auto',
-  //     fill: 'currentColor',
-  //   },
-  // },
 });
 
 const icon = styleVariants({
@@ -449,13 +443,6 @@ const icon = styleVariants({
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    // selectors: {
-    //   '& svg': {
-    //     width: '100%',
-    //     height: 'auto',
-    //     fill: 'currentColor',
-    //   },
-    // },
   },
   small: {
     width: '20px',
