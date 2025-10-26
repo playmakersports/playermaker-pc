@@ -3,12 +3,13 @@
  */
 export class HttpError extends Error {
   public readonly name = 'HttpError';
+  public readonly status: number;
+  public readonly data?: any;
 
-  constructor(
-    public readonly status: number,
-    public readonly data?: any,
-  ) {
+  constructor(status: number, data?: any) {
     super(data?.message);
+    this.status = status;
+    this.data = data;
   }
 }
 

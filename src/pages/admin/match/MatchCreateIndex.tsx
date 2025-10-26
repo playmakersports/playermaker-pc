@@ -1,35 +1,59 @@
 import clsx from 'clsx';
 import { useState } from 'react';
-import { fonts } from '@/style/typo.css.ts';
 import { useFieldArray, useForm } from 'react-hook-form';
-import Button from '@/share/components/Button.tsx';
+import { useMutation, useQuery } from '@tanstack/react-query';
+
+import { getTeamList } from '@/apis/team.ts';
+import { fonts } from '@/style/typo.css.ts';
 import { matchCreateStyle as style } from '@/pages/admin/match/match.css.ts';
+import Button from '@/share/components/Button.tsx';
 import BaseInput from '@/share/components/inputs/BaseInput.tsx';
 import DateInput from '@/share/components/inputs/DateInput.tsx';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { getTeamList } from '@/apis/team.ts';
 import InputWrapper from '@/share/components/inputs/InputWrapper.tsx';
-import { inputStyle } from '@/share/components/css/input.css.ts';
+import { lib } from '@/share/libs/dialog.tsx';
 import { flexs } from '@/style/container.css.ts';
+import { inputStyle } from '@/share/components/css/input.css.ts';
+import { PlayerListInput } from '@/pages/admin/feature/PlayerListInput.tsx';
+import { postMatchInfo, postMatchQuarter } from '@/apis/match.ts';
+import { spinner } from '@/share/components/css/ui.css.ts';
 import CloseIcon from '@/assets/icons/common/Close20.svg?react';
 import CheckIcon from '@/assets/icons/common/Check.svg?react';
-import { postMatchInfo, postMatchQuarter } from '@/apis/match.ts';
-import { lib } from '@/share/libs/dialog.tsx';
-import { spinner } from '@/share/components/css/ui.css.ts';
-import { PlayerListInput } from '@/pages/admin/feature/PlayerListInput.tsx';
+
+interface PlayerData {
+  name: string;
+  number: string;
+  starter: boolean;
+  playerId?: number;
+}
+
+interface PlayersSubmitData {
+  matchId?: number;
+  quarter?: number;
+  homeTeamId: number;
+  awayTeamId?: number;
+  homePlayers: PlayerData[];
+  awayPlayers: PlayerData[];
+}
+
+interface InitialSubmitData {
+  awayTeamId: number;
+  date: string;
+  time: string;
+  location: string;
+}
 
 function MatchCreateIndex() {
   const [stage, setStage] = useState(1);
-  const initialForm = useForm();
+  const initialForm = useForm<any>();
   const { register, watch, control, setValue, handleSubmit } = useForm<any>({
     defaultValues: {
       homeTeamId: 1,
       homePlayers: Array(6)
         .fill(null)
-        .map(() => ({ number: '', name: '', isStarter: false })),
+        .map(() => ({ number: '', name: '', starter: false })),
       awayPlayers: Array(6)
         .fill(null)
-        .map(() => ({ number: '', name: '', isStarter: false })),
+        .map(() => ({ number: '', name: '', starter: false })),
     },
   });
 
@@ -59,7 +83,7 @@ function MatchCreateIndex() {
     mutationFn: postMatchQuarter,
   });
 
-  const onInitialSubmit = data => {
+  const onInitialSubmit = (data: InitialSubmitData) => {
     // postMatchInfo
     initialMutation.mutate(
       {
@@ -87,7 +111,7 @@ function MatchCreateIndex() {
     );
   };
 
-  const onPlayersSubmit = data => {
+  const onPlayersSubmit = (data: PlayersSubmitData) => {
     const homePlayers = data.homePlayers
       .map(player => ({
         teamId: data.homeTeamId,
@@ -116,10 +140,14 @@ function MatchCreateIndex() {
 
     quarterMutation.mutate(
       {
-        matchId: data.matchId,
-        quarter: data.quarter,
+        matchId: data.matchId!,
+        quarter: data.quarter!,
         homeTeamId: data.homeTeamId,
-        players: [...homePlayers, ...awayPlayers],
+        players: [...homePlayers, ...awayPlayers].map((player: any) => ({
+          ...player,
+          playerId: player.playerId || 0,
+          subYn: false,
+        })),
       },
       {
         onSuccess: () => {
@@ -166,7 +194,7 @@ function MatchCreateIndex() {
         </div>
       </div>
       <section className={style.formLayout}>
-        <form onSubmit={initialForm.handleSubmit(onInitialSubmit)}>
+        <form onSubmit={initialForm.handleSubmit(onInitialSubmit as any)}>
           <aside className={style.aside} data-staged={stage === 1}>
             <InputWrapper title="상대 팀" required>
               <select
@@ -258,7 +286,7 @@ function MatchCreateIndex() {
                   ))}
                   <Button
                     type="button"
-                    mode="gray"
+                    theme="gray"
                     fillType="light"
                     size="small"
                     fullWidth

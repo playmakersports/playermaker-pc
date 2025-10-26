@@ -16,9 +16,9 @@ type MatchPlayerRequest = {
 };
 export type PostMatchQuarterRequest = {
   players: MatchPlayerRequest[];
-  matchId: string;
-  quarter: string;
-  homeTeamId: string;
+  matchId: number;
+  quarter: number;
+  homeTeamId: number;
 };
 
 export type MatchInfoResponse = {

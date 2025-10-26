@@ -20,10 +20,10 @@ function HomeIndex() {
             경기를 운영해 보세요!
           </h1>
           <div className={clsx(fullwidth, flexs({ dir: 'col', align: 'start', gap: '8' }))}>
-            <Button type="button" mode="gray" fillType="outline" size="xlarge" fullWidth>
+            <Button type="button" theme="gray" fillType="outline" size="xlarge" fullWidth>
               구글 로그인
             </Button>
-            <Button type="button" mode="gray" fillType="outline" size="xlarge" fullWidth>
+            <Button type="button" theme="gray" fillType="outline" size="xlarge" fullWidth>
               카카오 로그인
             </Button>
           </div>
