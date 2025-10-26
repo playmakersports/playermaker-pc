@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { recentActionStyle as style } from '@/pages/admin/playing/feature/css/recent-action-list.css.ts';
 import { useAtomValue, useSetAtom } from 'jotai/index';
 import { gameEventsAtom, pausedEventsAtom, popEventAtom } from '@/store/game-events-atom.ts';

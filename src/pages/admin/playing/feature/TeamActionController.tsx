@@ -15,7 +15,7 @@ type PlayerInfo = {
   playerId: number;
   playerName: string;
   playerNo: number;
-  teamType: string;
+  teamType: 'home' | 'away';
 };
 type Props = {
   teamType: 'home' | 'away';

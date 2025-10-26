@@ -87,19 +87,9 @@ globalStyle(`ul.${headerTeamFouls} > li`, {
   color: theme.color.gray['400'],
   borderRadius: '2px',
 });
-globalStyle(`ul.${headerTeamFouls} > li`, {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '32px',
-  height: '32px',
-  backgroundColor: theme.color.gray['200'],
-  color: theme.color.gray['300'],
-  borderRadius: '2px',
-  '&[data-active="true"]': {
-    backgroundColor: theme.color.red['500'],
-    color: theme.color.white,
-  },
+globalStyle(`ul.${headerTeamFouls} > li[data-active="true"]`, {
+  backgroundColor: theme.color.red['500'],
+  color: theme.color.white,
 });
 
 const controlCards = style({
