@@ -32,7 +32,7 @@ function PlayingIdIndex() {
     playerId: player.player.playerId,
     playerName: player.player.name,
     playerNo: player.player.number,
-    teamType: player.homeYn ? 'home' : 'away',
+    teamType: (player.homeYn ? 'home' : 'away') as 'home' | 'away',
   }));
 
   useEffect(() => {
