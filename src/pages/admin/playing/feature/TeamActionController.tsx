@@ -132,8 +132,8 @@ function TeamActionController(props: Props) {
           ?.filter(player => player.teamType === teamType && playing[teamType].includes(player.playListId))
           .map(player => {
             const playerFouls =
-              personalFouls?.filter(f => f.playListId === player.playListId).length +
-              technicalFouls?.filter(f => f.playListId === player.playListId).length;
+              (personalFouls ?? [])?.filter(f => f.playListId === player.playListId).length +
+              (technicalFouls ?? [])?.filter(f => f.playListId === player.playListId).length;
             const playerTechnicalFouls = technicalFouls?.filter(f => f.playListId === player.playListId).length;
             return (
               <button
