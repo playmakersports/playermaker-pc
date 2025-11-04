@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { type PlayingActionType } from '@/enums/playing.ts';
 
 export interface GameEvent {
-  playerId: number | null;
+  playListId: number | null;
   actionType: PlayingActionType;
   teamType: 'home' | 'away' | null;
   timestamp: number;

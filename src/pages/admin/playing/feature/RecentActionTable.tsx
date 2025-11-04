@@ -15,7 +15,7 @@ type Props = {
   quarter: number;
   teamType: 'home' | 'away';
   playerList: {
-    playerId: number;
+    playListId: number;
     playerName: string;
     playerNo: number;
     teamType: 'home' | 'away';
@@ -99,9 +99,9 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
                 {timestampToTimerMS(calculateGameTime(action.timestamp, quarterStartTimestamp, pausedEvents, quarter))}
               </span>
               <span className={style.playerNum}>
-                {playerList?.find(player => player.playerId === action.playerId)?.playerNo}
+                {playerList?.find(player => player.playListId === action.playListId)?.playerNo}
               </span>
-              <span>{playerList?.find(player => player.playerId === action.playerId)?.playerName}</span>
+              <span>{playerList?.find(player => player.playListId === action.playListId)?.playerName}</span>
               <span>{ACTION_NAME[action.actionType]}</span>
             </li>
           );

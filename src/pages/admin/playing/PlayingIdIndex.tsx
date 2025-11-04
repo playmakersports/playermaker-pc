@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useParams } from 'react-router';
 import { groupBy, mapValues, sumBy } from 'es-toolkit';
+import { useGetMatchInfo } from '@/query/match.ts';
 
 import { fonts } from '@/style/typo.css.ts';
 import { playingStyle as style } from '@/pages/admin/playing/playing.css.ts';
 import { addEventAtom, gameEventsAtom, pausedEventsAtom, timerAtom } from '@/store/game-events-atom.ts';
 import RunningScoreTable from '@/pages/admin/playing/feature/RunningScoreTable.tsx';
 import { type PlayingActionType } from '@/enums/playing.ts';
-import { useGetMatchInfo } from '@/query/match.ts';
 import { flexs } from '@/style/container.css.ts';
 import { timestampToTimerMS } from '@/share/libs/format.ts';
 import TeamActionController from '@/pages/admin/playing/feature/TeamActionController.tsx';
-import { useSetAtom } from 'jotai/index';
 
 function PlayingIdIndex() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -29,7 +28,7 @@ function PlayingIdIndex() {
 
   const { data } = useGetMatchInfo(Number(matchId));
   const playerList = data?.playlists.map(player => ({
-    playerId: player.player.playerId,
+    playListId: player.playListId,
     playerName: player.player.name,
     playerNo: player.player.number,
     teamType: (player.homeYn ? 'home' : 'away') as 'home' | 'away',
@@ -38,8 +37,8 @@ function PlayingIdIndex() {
   useEffect(() => {
     if (data) {
       setPlaying({
-        home: data.playlists.filter(p => p.homeYn && p.starter).map(p => p.player.playerId),
-        away: data.playlists.filter(p => !p.homeYn && p.starter).map(p => p.player.playerId),
+        home: data.playlists.filter(p => p.homeYn && p.starter).map(p => p.playListId),
+        away: data.playlists.filter(p => !p.homeYn && p.starter).map(p => p.playListId),
       });
     }
   }, [data]);
@@ -65,7 +64,7 @@ function PlayingIdIndex() {
   const handleQuarterStart = () => {
     if (timer.pausedTime === 0 && !timer.isRunning) {
       addEvent({
-        playerId: null,
+        playListId: null,
         teamType: null,
         actionType: `${quarter}S` as PlayingActionType,
         quarter,
@@ -119,7 +118,7 @@ function PlayingIdIndex() {
         pausedTime: 0,
       });
       addEvent({
-        playerId: null,
+        playListId: null,
         teamType: null,
         actionType: `${quarter}E` as PlayingActionType,
         quarter,
@@ -216,7 +215,7 @@ function PlayingIdIndex() {
                 .filter(event => ['1', '2', '3'].includes(event.actionType))
                 .map(event => ({
                   ...event,
-                  playerNo: playerList?.find(p => p.playerId === event.playerId)?.playerNo || -1,
+                  playerNo: playerList?.find(p => p.playListId === event.playListId)?.playerNo || -1,
                 }))}
             />
             <div>
