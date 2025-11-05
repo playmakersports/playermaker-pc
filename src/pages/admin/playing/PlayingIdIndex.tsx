@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
+import { overlay } from 'overlay-kit';
 import { useAtom, useSetAtom } from 'jotai';
 import { useParams } from 'react-router';
 import { groupBy, mapValues, sumBy } from 'es-toolkit';
@@ -13,6 +14,7 @@ import { type PlayingActionType } from '@/enums/playing.ts';
 import { flexs } from '@/style/container.css.ts';
 import { timestampToTimerMS } from '@/share/libs/format.ts';
 import TeamActionController from '@/pages/admin/playing/feature/TeamActionController.tsx';
+import QuarterSummary from './feature/QuarterSummary';
 
 function PlayingIdIndex() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -125,6 +127,8 @@ function PlayingIdIndex() {
       });
       setQuarter(prev => prev + 1);
     }
+
+    overlay.open(controller => <QuarterSummary {...controller} handleQuarterStart={handleQuarterStart} />);
   };
 
   useEffect(() => {
