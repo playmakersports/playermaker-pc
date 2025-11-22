@@ -15,6 +15,7 @@ import { flexs } from '@/style/container.css.ts';
 import { timestampToTimerMS } from '@/share/libs/format.ts';
 import TeamActionController from '@/pages/admin/playing/feature/TeamActionController.tsx';
 import QuarterSummary from './feature/QuarterSummary';
+import Icons from '@/share/common/Icons.tsx';
 
 function PlayingIdIndex() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -24,7 +25,7 @@ function PlayingIdIndex() {
   const [, addEvent] = useAtom(addEventAtom);
   const [timer, setTimer] = useAtom(timerAtom);
   const [currentTime, setCurrentTime] = useState(0);
-  const [quarter, setQuarter] = useState(1);
+  const [quarter, setQuarter] = useState(0);
 
   const [playing, setPlaying] = useState<{ home: number[]; away: number[] }>({ home: [], away: [] });
 
@@ -38,6 +39,7 @@ function PlayingIdIndex() {
 
   useEffect(() => {
     if (data) {
+      // 선발 선수 설정
       setPlaying({
         home: data.playlists.filter(p => p.homeYn && p.starter).map(p => p.playListId),
         away: data.playlists.filter(p => !p.homeYn && p.starter).map(p => p.playListId),
@@ -45,6 +47,9 @@ function PlayingIdIndex() {
     }
   }, [data]);
 
+  /**
+   * 팀 점수 집계 함수
+   */
   const teamScores = () => {
     return mapValues(
       groupBy(
@@ -54,7 +59,9 @@ function PlayingIdIndex() {
       items => sumBy(items, event => Number(event.actionType)),
     );
   };
-
+  /**
+   * 팀 파울 집계 함수
+   */
   const teamFouls = useMemo(() => {
     const { PF: personalFouls } = groupBy(gameEvents, event => event.actionType);
     return groupBy(
@@ -64,17 +71,20 @@ function PlayingIdIndex() {
   }, [gameEvents]);
 
   const handleQuarterStart = () => {
-    if (timer.pausedTime === 0 && !timer.isRunning) {
-      addEvent({
-        playListId: null,
-        teamType: null,
-        actionType: `${quarter}S` as PlayingActionType,
-        quarter,
-      });
-    }
-    handleTimerToggle();
+    setTimer({
+      isRunning: true,
+      startTimestamp: Date.now(),
+      pausedTime: 0,
+    });
+    addEvent({
+      playListId: null,
+      teamType: null,
+      actionType: `${quarter + 1}S` as PlayingActionType,
+      quarter: quarter + 1,
+    });
+    setQuarter(prev => prev + 1);
   };
-  const handleTimerToggle = () => {
+  const handleTimeOut = () => {
     const now = Date.now();
 
     if (timer.isRunning) {
@@ -112,23 +122,20 @@ function PlayingIdIndex() {
   };
 
   const handleQuarterEnd = () => {
-    if (timer.isRunning) {
-      handleTimerToggle();
-      setTimer({
-        isRunning: false,
-        startTimestamp: null,
-        pausedTime: 0,
-      });
-      addEvent({
-        playListId: null,
-        teamType: null,
-        actionType: `${quarter}E` as PlayingActionType,
-        quarter,
-      });
-      setQuarter(prev => prev + 1);
-    }
-
-    overlay.open(controller => <QuarterSummary {...controller} handleQuarterStart={handleQuarterStart} />);
+    setTimer({
+      isRunning: false,
+      startTimestamp: null,
+      pausedTime: 0,
+    });
+    addEvent({
+      playListId: null,
+      teamType: null,
+      actionType: `${quarter}E` as PlayingActionType,
+      quarter,
+    });
+    overlay.open(controller => (
+      <QuarterSummary {...controller} quarter={quarter} handleQuarterStart={handleQuarterStart} />
+    ));
   };
 
   useEffect(() => {
@@ -152,12 +159,28 @@ function PlayingIdIndex() {
     };
   }, [timer]);
 
+  const [hideDataView, setHideDataView] = useState(false);
   return (
     <div style={{ display: 'flex' }}>
+      <button
+        type="button"
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          backgroundColor: 'yellow',
+          width: '40px',
+          height: '40px',
+        }}
+        onClick={() => setHideDataView(prev => !prev)}
+      >
+        데이터
+      </button>
       <div
         className={fonts.body4.regular}
         style={{
-          padding: '10px',
+          display: hideDataView ? 'none' : 'block',
+          padding: '48px 10px 12px',
           width: '200px',
           wordWrap: 'break-word',
           whiteSpace: 'pre-wrap',
@@ -165,7 +188,7 @@ function PlayingIdIndex() {
           overflow: 'auto',
         }}
       >
-        {JSON.stringify(gameEvents).replaceAll('}', '}\n')}
+        <p>{JSON.stringify(gameEvents).replaceAll('}', '}\n')}</p>
       </div>
       <section className={style.pageSection} style={{ flex: 1 }}>
         <header className={style.layoutContainer}>
@@ -183,9 +206,13 @@ function PlayingIdIndex() {
           </div>
           <div className={style.headerCenter}>
             <div style={{ flex: 1 }}>{teamScores().home}</div>
-            <div className={clsx(style.playingScore, { [style.playingTimeout]: !timer.isRunning })}>
-              {quarter}Q - <span className="time">{timestampToTimerMS(currentTime)}</span>
-            </div>
+            {quarter === 0 ? (
+              <div className={style.playingScore}>경기시작 전</div>
+            ) : (
+              <div className={clsx(style.playingScore, { [style.playingTimeout]: !timer.isRunning })}>
+                {quarter}Q - <span className="time">{timestampToTimerMS(currentTime)}</span>
+              </div>
+            )}
             <div style={{ flex: 1 }}>{teamScores().away}</div>
           </div>
           <div className={style.headerTeam}>
@@ -212,7 +239,7 @@ function PlayingIdIndex() {
               quarter={quarter}
             />
           </div>
-          <div>
+          <div className={flexs({ dir: 'col', gap: '12' })}>
             <RunningScoreTable
               maxScore={Math.max(teamScores().home || 0, teamScores().away || 0)}
               scores={gameEvents
@@ -222,13 +249,22 @@ function PlayingIdIndex() {
                   playerNo: playerList?.find(p => p.playListId === event.playListId)?.playerNo || -1,
                 }))}
             />
-            <div>
-              <button className={style.button.success} disabled={!timer.isRunning} onClick={handleQuarterEnd}>
-                쿼터 종료
-              </button>
-              <button className={style.button.warning} onClick={handleQuarterStart}>
-                {timer.isRunning ? 'TIME OUT' : 'START'}
-              </button>
+            <div className={flexs({ dir: 'col', gap: '8' })}>
+              {timer.isRunning && (
+                <button className={style.button.red} disabled={!timer.isRunning} onClick={handleQuarterEnd}>
+                  쿼터종료
+                </button>
+              )}
+              {currentTime !== 0 && (
+                <button className={style.button.warning} onClick={handleTimeOut}>
+                  {timer.isRunning ? '타임아웃' : '재개'}
+                </button>
+              )}
+              {!timer.isRunning && currentTime === 0 && (
+                <button className={style.button.info} disabled={timer.isRunning} onClick={handleQuarterStart}>
+                  시작 <Icons name="running" t="straight" w="bold" size={26} />
+                </button>
+              )}
             </div>
           </div>
           <div className={style.controlCards}>

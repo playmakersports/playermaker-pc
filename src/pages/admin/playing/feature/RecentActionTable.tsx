@@ -4,7 +4,7 @@ import { useAtomValue, useSetAtom } from 'jotai/index';
 import { gameEventsAtom, pausedEventsAtom, popEventAtom } from '@/store/game-events-atom.ts';
 import { groupBy, sortBy } from 'es-toolkit';
 import { PlayingActionEnums } from '@/enums/playing.ts';
-import { timestampToTimerMS, calculateGameTime } from '@/share/libs/format.ts';
+import { calculateGameTime, timestampToTimerMS } from '@/share/libs/format.ts';
 import { flexs } from '@/style/container.css.ts';
 import Button from '@/share/components/Button.tsx';
 import Icons from '@/share/common/Icons.tsx';
@@ -102,7 +102,7 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
                 {playerList?.find(player => player.playListId === action.playListId)?.playerNo}
               </span>
               <span>{playerList?.find(player => player.playListId === action.playListId)?.playerName}</span>
-              <span>{ACTION_NAME[action.actionType]}</span>
+              <span>{PlayingActionTypeName[action.actionType]}</span>
             </li>
           );
         })}
@@ -111,7 +111,7 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
   );
 }
 
-const ACTION_NAME: Record<string, string> = {
+export const PlayingActionTypeName: Record<string, string> = {
   [PlayingActionEnums.P_FOUL]: '파울P',
   [PlayingActionEnums.OF_FOUL]: '파울O',
   [PlayingActionEnums.TF_FOUL]: '파울T',

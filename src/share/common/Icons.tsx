@@ -23,6 +23,7 @@ function Icons(props: Props) {
         style={{
           display: 'inline-flex',
           alignItems: 'center',
+          flexShrink: 0,
           fontSize: size,
           height: size,
         }}
@@ -33,7 +34,7 @@ function Icons(props: Props) {
     return (
       <i
         className={`fi fi-${w[0]}${t[0]}-${props.name}`}
-        style={{ display: 'inline-flex', alignItems: 'center', fontSize: size, height: size }}
+        style={{ display: 'inline-flex', flexShrink: 0, alignItems: 'center', fontSize: size, height: size }}
       ></i>
     );
   }

@@ -96,12 +96,12 @@ const controlCards = style({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  gap: '10px',
+  gap: '40px',
 });
 const playingScoreTable = style({
   position: 'relative',
   width: centerWidthVar,
-  height: '77vh',
+  height: '75vh',
   border: `1px solid ${theme.color.gray['300']}`,
   borderRadius: '8px',
   overflow: 'auto',
@@ -196,10 +196,10 @@ const playerButton = style([
   },
 ]);
 const actionButton = style([
-  fonts.body1.medium,
+  fonts.head6.medium,
   {
     userSelect: 'none',
-    padding: '16px 0',
+    padding: '24px 0',
     backgroundColor: theme.color.primary['200'],
     borderRadius: '6px',
     cursor: 'pointer',
@@ -274,9 +274,13 @@ const playerFoulCount = style({
 });
 
 const buttonBase = style([
-  fonts.head5.medium,
+  fonts.head6.medium,
   {
-    padding: '8px 10px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '3px',
+    width: '100%',
+    padding: '8px 14px',
     color: theme.color.white,
     borderRadius: '8px',
     cursor: 'pointer',
@@ -292,14 +296,94 @@ const buttonBase = style([
 ]);
 
 const button = styleVariants({
-  primary: [buttonBase, { backgroundColor: theme.color.primary['500'] }],
-  success: [buttonBase, { backgroundColor: theme.color.success['500'] }],
-  info: [buttonBase, { backgroundColor: theme.color.info['500'] }],
-  warning: [buttonBase, { backgroundColor: theme.color.warning['500'] }],
-  red: [buttonBase, { backgroundColor: theme.color.red['500'] }],
-  purple: [buttonBase, { backgroundColor: theme.color.purple['500'] }],
-  magenta: [buttonBase, { backgroundColor: theme.color.magenta['500'] }],
-  gray: [buttonBase, { backgroundColor: theme.color.gray['500'] }],
+  primary: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.primary['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.primary['600'],
+        },
+      },
+    },
+  ],
+  success: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.success['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.success['600'],
+        },
+      },
+    },
+  ],
+  info: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.info['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.info['600'],
+        },
+      },
+    },
+  ],
+  warning: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.warning['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.warning['600'],
+        },
+      },
+    },
+  ],
+  red: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.red['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.red['600'],
+        },
+      },
+    },
+  ],
+  purple: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.purple['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.purple['600'],
+        },
+      },
+    },
+  ],
+  magenta: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.magenta['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.magenta['600'],
+        },
+      },
+    },
+  ],
+  gray: [
+    buttonBase,
+    {
+      backgroundColor: theme.color.gray['500'],
+      selectors: {
+        '&:active': {
+          backgroundColor: theme.color.gray['600'],
+        },
+      },
+    },
+  ],
 });
 
 export const playingStyle = {

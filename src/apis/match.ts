@@ -47,3 +47,14 @@ export const getMatchInfoDetail = async (matchId: number) => {
     throw error;
   }
 };
+
+export const postMatchStatAdd = async (request: any) => {
+  try {
+    return await http.post<MatchInfoDetailResponse>(`/api/match/stat`, { json: request });
+  } catch (error) {
+    if (isHttpError(error)) {
+      throw new Error(error.message);
+    }
+    throw error;
+  }
+};
