@@ -175,7 +175,7 @@ function TeamActionController(props: Props) {
           <button
             type="button"
             className={style.playerChangeButton}
-            disabled={selected.playListId === null}
+            disabled={selected.playListId === null || quarter === 0}
             onClick={() => handleActionSelect(PlayingActionEnums.PLAYER_OUT)}
           >
             <Icons name="refresh" w="bold" t="round" size={24} />
@@ -189,7 +189,7 @@ function TeamActionController(props: Props) {
             <button
               type="button"
               key={action.type}
-              disabled={selected.playListId === null}
+              disabled={selected.playListId === null || quarter === 0}
               data-selected={selected.actionType === action.type}
               className={style.actionButton}
               onClick={() => handleActionSelect(action.type)}

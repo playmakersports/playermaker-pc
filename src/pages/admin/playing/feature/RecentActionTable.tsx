@@ -1,15 +1,16 @@
 import { memo, useCallback, useEffect } from 'react';
-import { recentActionStyle as style } from '@/pages/admin/playing/feature/css/recent-action-list.css.ts';
-import { useAtomValue, useSetAtom } from 'jotai/index';
-import { gameEventsAtom, pausedEventsAtom, popEventAtom } from '@/store/game-events-atom.ts';
-import { groupBy, sortBy } from 'es-toolkit';
-import { PlayingActionEnums } from '@/enums/playing.ts';
-import { calculateGameTime, timestampToTimerMS } from '@/share/libs/format.ts';
+import clsx from 'clsx';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { groupBy, orderBy } from 'es-toolkit';
+
+import { fonts } from '@/style/typo.css.ts';
 import { flexs } from '@/style/container.css.ts';
 import Button from '@/share/components/Button.tsx';
 import Icons from '@/share/common/Icons.tsx';
-import clsx from 'clsx';
-import { fonts } from '@/style/typo.css.ts';
+import { recentActionStyle as style } from '@/pages/admin/playing/feature/css/recent-action-list.css.ts';
+import { gameEventsAtom, pausedEventsAtom, popEventAtom } from '@/store/game-events-atom.ts';
+import { PlayingActionEnums } from '@/enums/playing.ts';
+import { calculateGameTime, timestampToTimerMS } from '@/share/libs/format.ts';
 
 type Props = {
   quarter: number;
@@ -28,10 +29,11 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
   const popEvent = useSetAtom(popEventAtom);
 
   const quarterStartTimestamp = actions.find(action => action.actionType === `${quarter}S`)?.timestamp ?? 0;
-  const recent = sortBy(
+  const recent = orderBy(
     actions.filter(action => action.quarter === quarter && action.teamType === teamType),
     [action => action.timestamp],
-  ).reverse();
+    ['desc'],
+  ).slice(0, 12);
 
   const handleUndoAction = useCallback(() => {
     if (!(quarterActions[quarter]?.length > 1)) return;
@@ -91,10 +93,11 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
           </div>
         </div>
       </div>
+
       <ul className={style.container}>
         {recent.map(action => {
           return (
-            <li key={`${action.timestamp}-${action.actionType}`} className={style.action}>
+            <li key={`${action.timestamp}-${action.playListId}-${action.actionType}`} className={style.action}>
               <span className={style.time}>
                 {timestampToTimerMS(calculateGameTime(action.timestamp, quarterStartTimestamp, pausedEvents, quarter))}
               </span>

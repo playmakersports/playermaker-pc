@@ -212,6 +212,7 @@ const actionButton = style([
         backgroundColor: theme.color.primary['400'],
       },
       '&:disabled': {
+        cursor: 'not-allowed',
         backgroundColor: theme.color.gray['100'],
         color: theme.color.gray['400'],
       },

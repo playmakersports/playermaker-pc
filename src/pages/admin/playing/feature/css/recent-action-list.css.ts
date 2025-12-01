@@ -6,12 +6,13 @@ const title = style({
   margin: '24px 0 12px',
 });
 const container = style({
-  display: 'flex',
-  maxHeight: '210px',
-  flexDirection: 'column',
-  flexWrap: 'wrap',
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gridTemplateRows: 'repeat(6, 1fr)',
+  gridAutoFlow: 'column',
   gap: '4px 20px',
 });
+
 const action = style([
   fonts.body3.regular,
   {

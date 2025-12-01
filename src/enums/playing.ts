@@ -1,4 +1,4 @@
-export const PlayingActionEnums = {
+export const PlayingActionEnums: Record<string, string> = {
   POINT1: '1',
   POINT2: '2',
   POINT3: '3',

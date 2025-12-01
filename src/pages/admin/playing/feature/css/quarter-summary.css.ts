@@ -1,6 +1,6 @@
-import { style } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 import { theme } from '@/style/theme.css';
-import { fonts } from '@/style/typo.css';
+import { fonts, fontWeight } from '@/style/typo.css';
 
 const container = style({
   position: 'fixed',
@@ -45,7 +45,7 @@ const inner = style({
   },
 });
 
-const timeerText = style([
+const timerText = style([
   fonts.body3.regular,
   {
     color: theme.color.primary['600'],
@@ -56,7 +56,7 @@ const eventContainer = style({
   display: 'flex',
   margin: '20px -4px 0',
   height: '100%',
-  gap: '24px',
+  gap: '20px',
   justifyContent: 'space-between',
   flex: 1,
   minHeight: 0,
@@ -93,6 +93,51 @@ const eventCard = style([
 
 const eventFormSection = style({
   flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '28px',
 });
 
-export const summaryStyle = { container, inner, timeerText, eventContainer, eventList, eventCard, eventFormSection };
+const radioCards = style({
+  display: 'grid',
+  width: '100%',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gap: '12px',
+});
+const radioCard = style([
+  fonts.body4.regular,
+  {
+    cursor: 'pointer',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    backgroundColor: 'transparent',
+    border: `1px solid ${theme.color.gray['300']}`,
+    selectors: {
+      '&:has(input:checked)': {
+        backgroundColor: theme.color.primary['50'],
+        border: `1px solid ${theme.color.primary['500']}`,
+        color: theme.color.primary['800'],
+        fontWeight: fontWeight.medium,
+      },
+    },
+  },
+]);
+globalStyle(`${radioCard}:has(input:not(:checked)) > .fi`, {
+  opacity: 0.45,
+});
+
+export const summaryStyle = {
+  container,
+  inner,
+  timerText,
+  radioCards,
+  eventContainer,
+  eventList,
+  eventCard,
+  eventFormSection,
+  radioCard,
+};

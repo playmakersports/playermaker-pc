@@ -76,12 +76,18 @@ function PlayingIdIndex() {
       startTimestamp: Date.now(),
       pausedTime: 0,
     });
-    addEvent({
-      playListId: null,
-      teamType: null,
-      actionType: `${quarter + 1}S` as PlayingActionType,
-      quarter: quarter + 1,
+
+    Object.entries(playing).forEach(([teamType, playerListIds]) => {
+      playerListIds.forEach(playListId => {
+        addEvent({
+          playListId,
+          teamType: teamType as 'home' | 'away',
+          actionType: `${quarter + 1}S` as PlayingActionType,
+          quarter: quarter + 1,
+        });
+      });
     });
+
     setQuarter(prev => prev + 1);
   };
   const handleTimeOut = () => {
@@ -127,14 +133,29 @@ function PlayingIdIndex() {
       startTimestamp: null,
       pausedTime: 0,
     });
-    addEvent({
-      playListId: null,
-      teamType: null,
-      actionType: `${quarter}E` as PlayingActionType,
-      quarter,
+
+    Object.entries(playing).forEach(([teamType, playerListIds]) => {
+      playerListIds.forEach(playListId => {
+        addEvent({
+          playListId,
+          teamType: teamType as 'home' | 'away',
+          actionType: `${quarter}E` as PlayingActionType,
+          quarter,
+        });
+      });
     });
+
     overlay.open(controller => (
-      <QuarterSummary {...controller} quarter={quarter} handleQuarterStart={handleQuarterStart} />
+      <QuarterSummary
+        {...controller}
+        quarter={quarter}
+        players={playerList ?? []}
+        handleQuarterStart={handleQuarterStart}
+        teamName={{
+          home: data?.recordMatchResponseDto.homeTeam.teamName ?? '',
+          away: data?.recordMatchResponseDto.awayTeam.teamName ?? '',
+        }}
+      />
     ));
   };
 
