@@ -7,6 +7,10 @@ export const flexs = recipe({
     alignItems: 'center',
   },
   variants: {
+    wrap: {
+      true: { flexWrap: 'wrap' },
+      false: { flexWrap: 'nowrap' },
+    },
     justify: {
       center: { justifyContent: 'center' },
       spb: { justifyContent: 'space-between' },
