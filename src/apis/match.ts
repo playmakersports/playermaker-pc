@@ -5,6 +5,7 @@ import type {
   PostMatchInfoRequest,
   PostMatchQuarterRequest,
 } from '@/apis/models/match.ts';
+import type { GameEvent } from '@/store/game-events-atom.ts';
 
 export const postMatchInfo = async (request: PostMatchInfoRequest) => {
   try {
@@ -19,6 +20,16 @@ export const postMatchInfo = async (request: PostMatchInfoRequest) => {
 export const postMatchQuarter = async (request: PostMatchQuarterRequest) => {
   try {
     return await http.post('/api/match/interaction/sQuarter', { json: request });
+  } catch (error) {
+    if (isHttpError(error)) {
+      throw new Error(error.message);
+    }
+    throw error;
+  }
+};
+export const getMatchRoaster = async () => {
+  try {
+    return await http.get('/api/match/interaction/roaster');
   } catch (error) {
     if (isHttpError(error)) {
       throw new Error(error.message);
@@ -48,7 +59,7 @@ export const getMatchInfoDetail = async (matchId: number) => {
   }
 };
 
-export const postMatchStatAdd = async (request: any) => {
+export const postMatchStatAdd = async (request: GameEvent[]) => {
   try {
     return await http.post<MatchInfoDetailResponse>(`/api/match/stat`, { json: request });
   } catch (error) {
