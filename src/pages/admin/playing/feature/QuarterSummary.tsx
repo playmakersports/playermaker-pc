@@ -16,7 +16,7 @@ import { PlayingActionEnums } from '@/enums/playing.ts';
 import Icons from '@/share/common/Icons.tsx';
 
 type PlayerInfo = {
-  playListId: number;
+  rosterId: number;
   playerName: string;
   playerNo: number;
   teamType: 'home' | 'away';
@@ -97,8 +97,8 @@ function QuarterSummary(props: Props) {
             {quarterEvents
               .filter(evt => evt.teamType !== null && !/(^\d[SE])$/.test(evt.actionType))
               .map(event => {
-                const eventId = `${event.timestamp}#${event.actionType}@${event.playListId}`;
-                const { playerName, playerNo } = players?.find(p => p.playListId === event.playListId) ?? {
+                const eventId = `${event.timestamp}#${event.actionType}@${event.rosterId}`;
+                const { playerName, playerNo } = players?.find(p => p.rosterId === event.rosterId) ?? {
                   playerName: null,
                   playerNo: null,
                 };
@@ -129,8 +129,8 @@ function QuarterSummary(props: Props) {
               <h3 className={fonts.body3.medium}>선수 변경</h3>
               <div className={summaryStyle.radioCards}>
                 {players.map(player => (
-                  <label htmlFor={player.playListId.toString()} className={summaryStyle.radioCard}>
-                    <input type="radio" name="player" id={player.playListId.toString()} style={{ display: 'none' }} />
+                  <label htmlFor={`${player.rosterId}+${player.playerName}`} className={summaryStyle.radioCard}>
+                    <input type="radio" name="player" id={player.rosterId.toString()} style={{ display: 'none' }} />
                     <p className={flexs({ dir: 'col', align: 'start' })}>
                       <span className={fonts.body3.medium}>
                         ({player.playerNo}) {player.playerName}

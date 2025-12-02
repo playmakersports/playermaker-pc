@@ -16,7 +16,7 @@ type Props = {
   quarter: number;
   teamType: 'home' | 'away';
   playerList: {
-    playListId: number;
+    rosterId: number;
     playerName: string;
     playerNo: number;
     teamType: 'home' | 'away';
@@ -97,14 +97,14 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
       <ul className={style.container}>
         {recent.map(action => {
           return (
-            <li key={`${action.timestamp}-${action.playListId}-${action.actionType}`} className={style.action}>
+            <li key={`${action.timestamp}-${action.rosterId}-${action.actionType}`} className={style.action}>
               <span className={style.time}>
                 {timestampToTimerMS(calculateGameTime(action.timestamp, quarterStartTimestamp, pausedEvents, quarter))}
               </span>
               <span className={style.playerNum}>
-                {playerList?.find(player => player.playListId === action.playListId)?.playerNo}
+                {playerList?.find(player => player.rosterId === action.rosterId)?.playerNo}
               </span>
-              <span>{playerList?.find(player => player.playListId === action.playListId)?.playerName}</span>
+              <span>{playerList?.find(player => player.rosterId === action.rosterId)?.playerName}</span>
               <span>{PlayingActionTypeName[action.actionType]}</span>
             </li>
           );

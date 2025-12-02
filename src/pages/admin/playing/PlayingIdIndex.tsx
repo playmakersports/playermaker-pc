@@ -4,7 +4,7 @@ import { overlay } from 'overlay-kit';
 import { useAtom, useSetAtom } from 'jotai';
 import { useParams } from 'react-router';
 import { groupBy, mapValues, sumBy } from 'es-toolkit';
-import { useGetMatchInfo } from '@/query/match.ts';
+import { useGetMatchInfo, useGetMatchRoster } from '@/query/match.ts';
 
 import { fonts } from '@/style/typo.css.ts';
 import { playingStyle as style } from '@/pages/admin/playing/playing.css.ts';
@@ -30,22 +30,25 @@ function PlayingIdIndex() {
   const [playing, setPlaying] = useState<{ home: number[]; away: number[] }>({ home: [], away: [] });
 
   const { data } = useGetMatchInfo(Number(matchId));
-  const playerList = data?.playlists.map(player => ({
-    playListId: player.playListId,
-    playerName: player.player.name,
-    playerNo: player.player.number,
-    teamType: (player.homeYn ? 'home' : 'away') as 'home' | 'away',
+  const { data: players } = useGetMatchRoster(Number(matchId));
+
+  const playerList = players?.map(item => ({
+    rosterId: item.rosterId,
+    playerName: item.player.name,
+    playerNo: item.player.number,
+    teamType: item.teamType,
   }));
 
   useEffect(() => {
-    if (data) {
+    if (players) {
       // 선발 선수 설정
+      const playersGroupByTeamType = groupBy(players, obj => obj.teamType);
       setPlaying({
-        home: data.playlists.filter(p => p.homeYn && p.starter).map(p => p.playListId),
-        away: data.playlists.filter(p => !p.homeYn && p.starter).map(p => p.playListId),
+        home: playersGroupByTeamType['home']?.map(p => p.rosterId),
+        away: playersGroupByTeamType['away']?.map(p => p.rosterId),
       });
     }
-  }, [data]);
+  }, [players]);
 
   /**
    * 팀 점수 집계 함수
@@ -59,6 +62,7 @@ function PlayingIdIndex() {
       items => sumBy(items, event => Number(event.actionType)),
     );
   };
+
   /**
    * 팀 파울 집계 함수
    */
@@ -77,10 +81,10 @@ function PlayingIdIndex() {
       pausedTime: 0,
     });
 
-    Object.entries(playing).forEach(([teamType, playerListIds]) => {
-      playerListIds.forEach(playListId => {
+    Object.entries(playing).forEach(([teamType, rosterIds]) => {
+      rosterIds.forEach(rosterId => {
         addEvent({
-          playListId,
+          rosterId,
           teamType: teamType as 'home' | 'away',
           actionType: `${quarter + 1}S` as PlayingActionType,
           quarter: quarter + 1,
@@ -134,10 +138,10 @@ function PlayingIdIndex() {
       pausedTime: 0,
     });
 
-    Object.entries(playing).forEach(([teamType, playerListIds]) => {
-      playerListIds.forEach(playListId => {
+    Object.entries(playing).forEach(([teamType, rosterIds]) => {
+      rosterIds.forEach(rosterId => {
         addEvent({
-          playListId,
+          rosterId,
           teamType: teamType as 'home' | 'away',
           actionType: `${quarter}E` as PlayingActionType,
           quarter,
@@ -267,7 +271,7 @@ function PlayingIdIndex() {
                 .filter(event => ['1', '2', '3'].includes(event.actionType))
                 .map(event => ({
                   ...event,
-                  playerNo: playerList?.find(p => p.playListId === event.playListId)?.playerNo || -1,
+                  playerNo: playerList?.find(p => p.rosterId === event.rosterId)?.playerNo || -1,
                 }))}
             />
             <div className={flexs({ dir: 'col', gap: '8' })}>

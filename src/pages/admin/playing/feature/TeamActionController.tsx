@@ -12,7 +12,7 @@ import Icons from '@/share/common/Icons.tsx';
 import { flexs } from '@/style/container.css.ts';
 
 type PlayerInfo = {
-  playListId: number;
+  rosterId: number;
   playerName: string;
   playerNo: number;
   teamType: 'home' | 'away';
@@ -31,41 +31,41 @@ function TeamActionController(props: Props) {
   const addEvent = useSetAtom(addEventAtom);
   const [selected, setSelected] = useState<Selected>({
     teamType: null,
-    playListId: null,
+    rosterId: null,
     actionType: null,
   });
   const [isSubSelected, setIsSubSelected] = useState<boolean>();
 
-  const handlePlayerSelect = (playListId: number, teamType: Selected['teamType']) => {
+  const handlePlayerSelect = (rosterId: number, teamType: Selected['teamType']) => {
     if (!teamType) return;
-    if (selected.playListId === playListId) {
+    if (selected.rosterId === rosterId) {
       if (['1', '2', '3'].includes(selected.actionType!)) {
         // 점수 득점시 본인을 다시 선택한 경우는, 어시스트 없이 기록
         addEvent({
-          playListId: selected.playListId,
+          rosterId: selected.rosterId,
           actionType: selected.actionType!,
           quarter,
           teamType,
         });
       }
-      setSelected({ actionType: null, teamType: null, playListId: null });
+      setSelected({ actionType: null, teamType: null, rosterId: null });
       setIsSubSelected(false);
       return;
     }
     if (isSubSelected) {
       // 득점의 경우, 어시스트 선수를 선택함
-      const player = playerList?.find(p => p.playListId === selected.playListId);
-      if (player && selected.playListId && selected.actionType) {
+      const player = playerList?.find(p => p.rosterId === selected.rosterId);
+      if (player && selected.rosterId && selected.actionType) {
         // 득점자 기록
         addEvent({
-          playListId: selected.playListId,
+          rosterId: selected.rosterId,
           actionType: selected.actionType,
           quarter,
           teamType,
         });
         // 어시스트 혹은 교체 IN 기록
         addEvent({
-          playListId,
+          rosterId,
           actionType:
             selected.actionType === PlayingActionEnums.PLAYER_OUT
               ? PlayingActionEnums.PLAYER_IN
@@ -77,20 +77,20 @@ function TeamActionController(props: Props) {
         if (selected.actionType === PlayingActionEnums.PLAYER_OUT) {
           setPlaying(prev => ({
             ...prev,
-            [teamType]: prev[teamType].filter(id => id !== selected.playListId).concat(playListId),
+            [teamType]: prev[teamType].filter(id => id !== selected.rosterId).concat(rosterId),
           }));
         }
 
         setSelected({
           teamType: null,
-          playListId: null,
+          rosterId: null,
           actionType: null,
         });
         setIsSubSelected(false);
       }
     } else {
       // 어시스트가 아닌 경우
-      setSelected(prev => ({ ...prev, playListId, teamType }));
+      setSelected(prev => ({ ...prev, rosterId, teamType }));
     }
   };
 
@@ -98,7 +98,7 @@ function TeamActionController(props: Props) {
     if (!actionType || !selected.teamType) return;
     setSelected(prev => ({ ...prev, actionType }));
 
-    if (selected.playListId && actionType) {
+    if (selected.rosterId && actionType) {
       // 득점 혹은 교체 액션인 경우,
       if (['1', '2', '3', 'OUT'].includes(actionType)) {
         setIsSubSelected(true);
@@ -107,7 +107,7 @@ function TeamActionController(props: Props) {
       } else {
         addEvent({
           teamType: selected.teamType,
-          playListId: selected.playListId,
+          rosterId: selected.rosterId,
           actionType,
           quarter,
         });
@@ -116,7 +116,7 @@ function TeamActionController(props: Props) {
 
     setSelected({
       teamType: null,
-      playListId: null,
+      rosterId: null,
       actionType: null,
     });
   };
@@ -129,22 +129,22 @@ function TeamActionController(props: Props) {
     <div className={style.controlCards}>
       <div className={style.playersList}>
         {playerList
-          ?.filter(player => player.teamType === teamType && playing[teamType].includes(player.playListId))
+          ?.filter(player => player.teamType === teamType && playing[teamType].includes(player.rosterId))
           .map(player => {
             const playerFouls =
-              (personalFouls ?? [])?.filter(f => f.playListId === player.playListId).length +
-              (technicalFouls ?? [])?.filter(f => f.playListId === player.playListId).length;
-            const playerTechnicalFouls = technicalFouls?.filter(f => f.playListId === player.playListId).length;
+              (personalFouls ?? [])?.filter(f => f.rosterId === player.rosterId).length +
+              (technicalFouls ?? [])?.filter(f => f.rosterId === player.rosterId).length;
+            const playerTechnicalFouls = technicalFouls?.filter(f => f.rosterId === player.rosterId).length;
             return (
               <button
                 type="button"
-                key={player.playListId}
+                key={player.rosterId}
                 disabled={
-                  selected.actionType === PlayingActionEnums.PLAYER_OUT && selected.playListId !== player.playListId
+                  selected.actionType === PlayingActionEnums.PLAYER_OUT && selected.rosterId !== player.rosterId
                 }
-                data-selected={selected.playListId === player.playListId}
+                data-selected={selected.rosterId === player.rosterId}
                 className={style.playerButton}
-                onClick={() => handlePlayerSelect(player.playListId, teamType)}
+                onClick={() => handlePlayerSelect(player.rosterId, teamType)}
               >
                 <span className={fonts.body3.medium}>{player.playerName}</span>
                 <span className={style.subNumberText}>{player.playerNo}</span>
@@ -154,7 +154,7 @@ function TeamActionController(props: Props) {
                   <ul className={flexs({ gap: '2' })}>
                     {Array.from({ length: 5 }).map((_, index) => (
                       <li
-                        key={`${player.playListId}-fouls-${index}`}
+                        key={`${player.rosterId}-fouls-${index}`}
                         className={style.playerFoulCount}
                         data-active={index + 1 <= playerFouls}
                       />
@@ -175,7 +175,7 @@ function TeamActionController(props: Props) {
           <button
             type="button"
             className={style.playerChangeButton}
-            disabled={selected.playListId === null || quarter === 0}
+            disabled={selected.rosterId === null || quarter === 0}
             onClick={() => handleActionSelect(PlayingActionEnums.PLAYER_OUT)}
           >
             <Icons name="refresh" w="bold" t="round" size={24} />
@@ -189,7 +189,7 @@ function TeamActionController(props: Props) {
             <button
               type="button"
               key={action.type}
-              disabled={selected.playListId === null || quarter === 0}
+              disabled={selected.rosterId === null || quarter === 0}
               data-selected={selected.actionType === action.type}
               className={style.actionButton}
               onClick={() => handleActionSelect(action.type)}
@@ -208,7 +208,7 @@ function TeamActionController(props: Props) {
 
 interface Selected {
   teamType: 'home' | 'away' | null;
-  playListId: number | null;
+  rosterId: number | null;
   actionType: PlayingActionType | null;
 }
 
