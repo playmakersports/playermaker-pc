@@ -4,7 +4,7 @@ export const PlayingActionEnums: Record<string, string> = {
   POINT3: '3',
   ASSIST: 'A',
   BLOCK: 'B',
-  STEAL: 'S',
+  STEAL: 'SL',
   TURNOVER: 'T',
   ATTACK_REBOUND: 'AB',
   DEFENCE_REBOUND: 'DB',
