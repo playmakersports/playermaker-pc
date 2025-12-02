@@ -2,6 +2,7 @@ import { http, isHttpError } from '@/utils/http.ts';
 import type {
   MatchInfoDetailResponse,
   MatchInfoResponse,
+  MatchRosterResponseItem,
   PostMatchInfoRequest,
   PostMatchQuarterRequest,
 } from '@/apis/models/match.ts';
@@ -27,9 +28,13 @@ export const postMatchQuarter = async (request: PostMatchQuarterRequest) => {
     throw error;
   }
 };
-export const getMatchRoaster = async () => {
+export const getMatchRoster = async (matchId: number) => {
   try {
-    return await http.get('/api/match/interaction/roaster');
+    return await http.get<MatchRosterResponseItem[]>('/api/match/interaction/roster', {
+      searchParams: {
+        matchId,
+      },
+    });
   } catch (error) {
     if (isHttpError(error)) {
       throw new Error(error.message);
