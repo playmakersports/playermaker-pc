@@ -12,7 +12,6 @@ type MatchPlayerRequest = {
   name: string;
   number: number;
   position: string;
-  subYn: boolean;
 };
 export type PostMatchQuarterRequest = {
   players: MatchPlayerRequest[];
@@ -38,6 +37,22 @@ export type MatchInfoResponse = {
   status: 'BEFORE' | 'AFTER';
   matchDate: string; // 2025-09-02T04:00:00.000Z
   location: string;
+};
+
+export type MatchRosterResponseItem = {
+  rosterId: number;
+  player: {
+    name: string;
+    number: number;
+    playerId: number;
+    position: string | null;
+    recordTeam: {
+      teamId: number;
+      teamName: string;
+      logoUrl: string | null;
+    };
+  };
+  teamType: 'home' | 'away';
 };
 
 export type MatchInfoDetailResponse = {
