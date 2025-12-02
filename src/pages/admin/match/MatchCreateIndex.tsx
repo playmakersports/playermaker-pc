@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useState } from 'react';
+import { flatten } from 'es-toolkit';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -23,14 +24,14 @@ interface PlayerData {
   name: string;
   number: string;
   starter: boolean;
-  playerId?: number;
+  playerId: number;
 }
 
 interface PlayersSubmitData {
-  matchId?: number;
-  quarter?: number;
+  matchId: number;
+  quarter: number;
   homeTeamId: number;
-  awayTeamId?: number;
+  awayTeamId: number;
   homePlayers: PlayerData[];
   awayPlayers: PlayerData[];
 }
@@ -114,39 +115,34 @@ function MatchCreateIndex() {
   const onPlayersSubmit = (data: PlayersSubmitData) => {
     const homePlayers = data.homePlayers
       .map(player => ({
+        playerId: player.playerId,
         teamId: data.homeTeamId,
         name: player.name,
         number: Number(player.number),
         position: null,
-        starter: player.starter,
       }))
       .filter(player => player.name !== '');
     const awayPlayers = data.awayPlayers
       .map(player => ({
+        playerId: player.playerId,
         teamId: data.awayTeamId,
         name: player.name,
         number: Number(player.number),
         position: null,
-        starter: player.starter,
       }))
       .filter(player => player.name !== '');
-
-    if (homePlayers.filter(p => p.starter).length !== 5 || awayPlayers.filter(p => p.starter).length !== 5) {
-      lib.alert({
-        title: '선발 선수를 반드시 선택해야 합니다.',
-      });
-      return;
-    }
 
     quarterMutation.mutate(
       {
         matchId: data.matchId!,
         quarter: data.quarter!,
         homeTeamId: data.homeTeamId,
-        players: [...homePlayers, ...awayPlayers].map((player: any) => ({
-          ...player,
-          playerId: player.playerId || 0,
-          subYn: false,
+        players: flatten([homePlayers, awayPlayers]).map(p => ({
+          playerId: p.playerId,
+          teamId: p.teamId,
+          name: p.name,
+          number: p.number,
+          position: p.position!,
         })),
       },
       {
@@ -170,7 +166,7 @@ function MatchCreateIndex() {
   });
 
   return (
-    <div>
+    <>
       <div className={style.header}>
         <h2 className={clsx(fonts.body1.semibold)}>새 경기 만들기</h2>
         <div className={flexs({ justify: 'start' })}>
@@ -187,9 +183,6 @@ function MatchCreateIndex() {
             </div>
             <p>선수 명단</p>
             <div className={style.stepLine} />
-            {/*<Button type="submit" disabled={stage === 1}>*/}
-            {/*  등록*/}
-            {/*</Button>*/}
           </div>
         </div>
       </div>
@@ -269,15 +262,6 @@ function MatchCreateIndex() {
                         </PlayerListInput>
                       </div>
                       <div className={flexs({ gap: '4' })}>
-                        <label className={style.checkboxLabel}>
-                          <input
-                            type="checkbox"
-                            style={{ position: 'absolute', left: '-9999px' }}
-                            {...register(`${team.type === 'home' ? 'homePlayers' : 'awayPlayers'}.${index}.starter`)}
-                          />
-                          <CheckIcon width={20} height={20} />
-                          <span>선발</span>
-                        </label>
                         <div onClick={() => team.remove(index)} aria-label="선수 삭제">
                           <CloseIcon />
                         </div>
@@ -303,7 +287,7 @@ function MatchCreateIndex() {
           </Button>
         </form>
       </section>
-    </div>
+    </>
   );
 }
 
