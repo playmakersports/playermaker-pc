@@ -4,6 +4,7 @@ import { ko } from 'date-fns/locale';
 import { groupBy } from 'es-toolkit';
 import { Link } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useGetMatchRoster } from '@/query/match.ts';
 
 import { getMatchInfoDetail } from '@/apis/match.ts';
 import { align, fonts } from '@/style/typo.css.ts';
@@ -22,6 +23,7 @@ const MatchDetailSection = (props: Props) => {
     queryKey: ['getMatchInfoDetail', matchId],
     queryFn: () => getMatchInfoDetail(matchId!),
   });
+  const { data: players } = useGetMatchRoster(matchId!);
 
   if (isLoading) {
     return (
@@ -39,7 +41,6 @@ const MatchDetailSection = (props: Props) => {
 
   if (data) {
     const { homeTeam, awayTeam, homeScore, awayScore, status, matchDate, location } = data.recordMatchResponseDto;
-    const playerList = groupBy(data.playlists, player => (player.homeYn ? 'home' : 'away'));
 
     return (
       <div className={style.container}>
@@ -76,22 +77,23 @@ const MatchDetailSection = (props: Props) => {
           </div>
         </div>
         <div className={flexs({ gap: '24', align: 'start' })}>
-          {Object.entries(playerList).map(([team, players]) => (
-            <div key={team} className={clsx(fullwidth, flexs({ dir: 'col', gap: '8' }))}>
-              <p className={fonts.head5.semibold}>{team}</p>
-              <ul className={flexs({ dir: 'col', gap: '4', align: 'start' })}>
-                {players.map(player => (
-                  <li key={player.playListId} className={flexs({ gap: '16' })}>
-                    <div className={flexs({ gap: '8' })}>
-                      <span className={style.backNumber}>{player.player.number}</span>
-                      <span className={fonts.body1.regular}>{player.player.name}</span>
-                    </div>
-                    <span className={fonts.body3.semibold}> {player.starter ? '선발' : ''}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {players &&
+            Object.entries(groupBy(players, obj => obj.teamType)).map(([team, players]) => (
+              <div key={team} className={clsx(fullwidth, flexs({ dir: 'col', gap: '8' }))}>
+                <p className={fonts.head5.semibold}>{players[0].player.recordTeam.teamName}</p>
+                <ul className={flexs({ dir: 'col', gap: '4', align: 'start' })}>
+                  {players.map(player => (
+                    <li key={player.rosterId} className={flexs({ gap: '16' })}>
+                      <div className={flexs({ gap: '8' })}>
+                        <span className={style.backNumber}>{player.player.number}</span>
+                        <span className={fonts.body1.regular}>{player.player.name}</span>
+                      </div>
+                      <span className={fonts.body3.semibold}>--</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
         </div>
         <Link to={`/admin/playing/${matchId}`}>경기운영</Link>
       </div>
