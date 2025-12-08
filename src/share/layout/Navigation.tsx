@@ -7,7 +7,7 @@ function Navigation() {
   const pathname = location.pathname;
   const MENUS = [
     { name: '경기', path: '/admin/match' },
-    { name: '경기운영', path: '/admin/playing' },
+    // { name: '경기운영', path: '/admin/playing' },
   ];
 
   return (

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { overlay } from 'overlay-kit';
 import { useAtom, useSetAtom } from 'jotai';
-import { useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { groupBy, mapValues, sumBy } from 'es-toolkit';
 import { useGetMatchInfo, useGetMatchRoster } from '@/query/match.ts';
 
@@ -16,8 +16,12 @@ import { timestampToTimerMS } from '@/share/libs/format.ts';
 import TeamActionController from '@/pages/admin/playing/feature/TeamActionController.tsx';
 import QuarterSummary from './feature/QuarterSummary';
 import Icons from '@/share/common/Icons.tsx';
+import type { PlayingStarter } from '../match/MatchDetailSection';
+import { lib } from '@/share/libs/dialog';
 
 function PlayingIdIndex() {
+  const { state } = useLocation();
+  const navigate = useNavigate();
   const { matchId } = useParams<{ matchId: string }>();
 
   const [gameEvents] = useAtom(gameEventsAtom);
@@ -40,15 +44,19 @@ function PlayingIdIndex() {
   }));
 
   useEffect(() => {
-    if (players) {
+    if (state?.starter) {
+      const { starter } = state as { starter: PlayingStarter[] };
       // 선발 선수 설정
-      const playersGroupByTeamType = groupBy(players, obj => obj.teamType);
+      const playersGroupByTeamType = groupBy(starter, obj => obj.teamType);
       setPlaying({
         home: playersGroupByTeamType['home']?.map(p => p.rosterId),
         away: playersGroupByTeamType['away']?.map(p => p.rosterId),
       });
+    } else {
+      lib.alert({ title: `선발 선수 정보가 없습니다.\n경기 상세에서 선발 선수 선택 후 다시 시도해주세요.` });
+      navigate(`/admin/match`);
     }
-  }, [players]);
+  }, [state]);
 
   /**
    * 팀 점수 집계 함수
@@ -185,6 +193,7 @@ function PlayingIdIndex() {
   }, [timer]);
 
   const [hideDataView, setHideDataView] = useState(false);
+
   return (
     <div style={{ display: 'flex' }}>
       <button

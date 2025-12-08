@@ -31,4 +31,22 @@ const backNumber = style([
   },
 ]);
 
-export const matchDetailStyle = { container, description, backNumber };
+const starterButton = style([
+  fonts.body3.semibold,
+  flexs({ gap: '4' }),
+  {
+    cursor: 'pointer',
+    padding: '4px 6px',
+    borderRadius: '6px',
+    selectors: {
+      '&[data-active="true"]': {
+        backgroundColor: theme.color.primary['300'],
+      },
+      '&[data-active="false"]': {
+        color: theme.color.gray['400'],
+      },
+    },
+  },
+]);
+
+export const matchDetailStyle = { container, description, backNumber, starterButton };

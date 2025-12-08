@@ -30,12 +30,14 @@ const title = style([
   fonts.body2.semibold,
   {
     color: theme.color.gray['700'],
+    whiteSpace: 'pre-line',
   },
 ]);
 const contents = style([
   fonts.body4.regular,
   {
     color: theme.color.gray['700'],
+    whiteSpace: 'pre-line',
   },
 ]);
 

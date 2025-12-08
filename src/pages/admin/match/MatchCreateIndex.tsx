@@ -18,7 +18,6 @@ import { PlayerListInput } from '@/pages/admin/feature/PlayerListInput.tsx';
 import { postMatchInfo, postMatchQuarter } from '@/apis/match.ts';
 import { spinner } from '@/share/components/css/ui.css.ts';
 import CloseIcon from '@/assets/icons/common/Close20.svg?react';
-import CheckIcon from '@/assets/icons/common/Check.svg?react';
 
 interface PlayerData {
   name: string;
@@ -45,7 +44,11 @@ interface InitialSubmitData {
 
 function MatchCreateIndex() {
   const [stage, setStage] = useState(1);
-  const initialForm = useForm<any>();
+  const initialForm = useForm<InitialSubmitData>();
+  const {
+    formState: { errors, isValid },
+  } = initialForm;
+  console.log(errors);
   const { register, watch, control, setValue, handleSubmit } = useForm<any>({
     defaultValues: {
       homeTeamId: 1,
@@ -169,30 +172,17 @@ function MatchCreateIndex() {
     <>
       <div className={style.header}>
         <h2 className={clsx(fonts.body1.semibold)}>새 경기 만들기</h2>
-        <div className={flexs({ justify: 'start' })}>
-          <div className={style.stepItem} style={{ width: stage === 1 ? '560px' : '260px' }}>
-            <div className={style.stepCircle} data-staged={stage >= 1}>
-              {stage > 1 ? <CheckIcon width={28} height={28} /> : '1'}
-            </div>
-            <p>기본 정보</p>
-            <div className={style.stepLine} data-active={stage === 2} />
-          </div>
-          <div className={style.stepItem} style={{ flex: 1 }}>
-            <div className={style.stepCircle} data-staged={stage === 2}>
-              2
-            </div>
-            <p>선수 명단</p>
-            <div className={style.stepLine} />
-          </div>
-        </div>
       </div>
       <section className={style.formLayout}>
-        <form onSubmit={initialForm.handleSubmit(onInitialSubmit as any)}>
+        <form onSubmit={initialForm.handleSubmit(onInitialSubmit)}>
           <aside className={style.aside} data-staged={stage === 1}>
             <InputWrapper title="상대 팀" required>
               <select
+                disabled={stage === 2}
                 className={clsx(fonts.body3.regular, inputStyle.innerBox)}
-                {...initialForm.register('awayTeamId')}
+                {...initialForm.register('awayTeamId', {
+                  required: { message: '상대 팀을 선택해 주세요', value: true },
+                })}
               >
                 {teamList?.map(team => (
                   <option key={team.teamId} value={team.teamId} disabled={watch('homeTeamId') === team.teamId}>
@@ -201,11 +191,34 @@ function MatchCreateIndex() {
                 ))}
               </select>
             </InputWrapper>
-            <DateInput title="경기일" required={true} placeholder="선택해 주세요" {...initialForm.register('date')} />
+            <DateInput
+              disabled={stage === 2}
+              title="경기일"
+              placeholder="선택해 주세요"
+              {...initialForm.register('date', {
+                required: { message: '경기일을 선택해 주세요', value: true },
+              })}
+            />
             {/*<input type="time" />*/}
-            <BaseInput type="text" title="경기 시간" required {...initialForm.register('time')} />
-            <BaseInput type="text" title="경기 장소" {...initialForm.register('location')} />
-            <Button type="submit" disabled={initialMutation.isPending}>
+            <BaseInput
+              disabled={stage === 2}
+              type="text"
+              title="경기 시간"
+              placeholder="HH:MM 형식으로 입력"
+              {...initialForm.register('time', {
+                required: { message: '경기 시간을 입력해 주세요', value: true },
+                validate: value => /^([0-1]\d|2[0-3]):([0-5]\d)$/.test(value),
+              })}
+            />
+            <BaseInput type="text" title="경기 장소" disabled={stage === 2} {...initialForm.register('location')} />
+
+            <div className={fonts.body3.regular}>
+              {Object.values(errors).map(err => (
+                <p key={err.message}>{err?.message}</p>
+              ))}
+            </div>
+
+            <Button type="submit" size="large" disabled={initialMutation.isPending || !isValid || stage === 2}>
               {initialMutation.isPending ? (
                 <div className={spinner({ theme: 'gray', size: 24, stroke: 3 })} />
               ) : (
@@ -282,8 +295,8 @@ function MatchCreateIndex() {
               </div>
             ))}
           </div>
-          <Button type="submit" disabled={stage === 1}>
-            경기 생성
+          <Button type="submit" size="large" disabled={stage === 1}>
+            선수 명단 저장
           </Button>
         </form>
       </section>
