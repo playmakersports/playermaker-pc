@@ -1,15 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { groupBy } from 'es-toolkit';
+import clsx from 'clsx';
 
-import { fonts } from '@/style/typo.css.ts';
-import { playingStyle as style } from '@/pages/admin/playing/playing.css.ts';
 import { PlayingActionEnums, type PlayingActionType } from '@/enums/playing.ts';
 import { SubPlayerFloatingList } from '@/pages/admin/playing/feature/SubPlayerFloatingList.tsx';
 import RecentActionTable from '@/pages/admin/playing/feature/RecentActionTable.tsx';
 import { addEventAtom, gameEventsAtom } from '@/store/game-events-atom.ts';
 import Icons from '@/share/common/Icons.tsx';
-import { flexs } from '@/style/container.css.ts';
 
 type PlayerInfo = {
   rosterId: number;
@@ -40,7 +38,6 @@ function TeamActionController(props: Props) {
     if (!teamType) return;
     if (selected.rosterId === rosterId) {
       if (['1', '2', '3'].includes(selected.actionType!)) {
-        // 점수 득점시 본인을 다시 선택한 경우는, 어시스트 없이 기록
         addEvent({
           rosterId: selected.rosterId,
           actionType: selected.actionType!,
@@ -53,17 +50,14 @@ function TeamActionController(props: Props) {
       return;
     }
     if (isSubSelected) {
-      // 득점의 경우, 어시스트 선수를 선택함
       const player = playerList?.find(p => p.rosterId === selected.rosterId);
       if (player && selected.rosterId && selected.actionType) {
-        // 득점자 기록
         addEvent({
           rosterId: selected.rosterId,
           actionType: selected.actionType,
           quarter,
           teamType,
         });
-        // 어시스트 혹은 교체 IN 기록
         addEvent({
           rosterId,
           actionType:
@@ -89,7 +83,6 @@ function TeamActionController(props: Props) {
         setIsSubSelected(false);
       }
     } else {
-      // 어시스트가 아닌 경우
       setSelected(prev => ({ ...prev, rosterId, teamType }));
     }
   };
@@ -99,7 +92,6 @@ function TeamActionController(props: Props) {
     setSelected(prev => ({ ...prev, actionType }));
 
     if (selected.rosterId && actionType) {
-      // 득점 혹은 교체 액션인 경우,
       if (['1', '2', '3', 'OUT'].includes(actionType)) {
         setIsSubSelected(true);
         setSelected(prev => ({ ...prev, actionType }));
@@ -126,8 +118,8 @@ function TeamActionController(props: Props) {
   }, [gameEvents]);
 
   return (
-    <div className={style.controlCards}>
-      <div className={style.playersList}>
+    <div className="flex flex-1 flex-col gap-10">
+      <div className="grid grid-cols-3 rounded-lg gap-2">
         {playerList
           ?.filter(player => player.teamType === teamType && playing[teamType].includes(player.rosterId))
           .map(player => {
@@ -143,19 +135,26 @@ function TeamActionController(props: Props) {
                   selected.actionType === PlayingActionEnums.PLAYER_OUT && selected.rosterId !== player.rosterId
                 }
                 data-selected={selected.rosterId === player.rosterId}
-                className={style.playerButton}
+                className={clsx(
+                  'text-2xl font-medium select-none flex py-3 flex-col justify-center items-center bg-info-100 rounded-md cursor-pointer text-center',
+                  'hover:bg-info-200 active:bg-info-300',
+                  'disabled:bg-gray-100 disabled:text-gray-400',
+                  'data-[selected=true]:py-2.5 data-[selected=true]:bg-info-600 data-[selected=true]:text-white data-[selected=true]:border-2 data-[selected=true]:border-white data-[selected=true]:outline-2 data-[selected=true]:outline-info-600',
+                )}
                 onClick={() => handlePlayerSelect(player.rosterId, teamType)}
               >
-                <span className={fonts.body3.medium}>{player.playerName}</span>
-                <span className={style.subNumberText}>{player.playerNo}</span>
+                <span className="text-base font-medium">{player.playerName}</span>
+                <span className="text-4xl font-medium [font-feature-settings:'cv02','cv04','cv06','cv09','cv13']">
+                  {player.playerNo}
+                </span>
                 {playerTechnicalFouls >= 2 ? (
                   <span style={{ color: 'red', fontWeight: 'bold' }}>아웃</span>
                 ) : (
-                  <ul className={flexs({ gap: '2' })}>
+                  <ul className="flex items-center justify-center gap-0.5">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <li
                         key={`${player.rosterId}-fouls-${index}`}
-                        className={style.playerFoulCount}
+                        className="inline-flex size-4 rounded-full border-2 border-gray-400 data-[active=true]:bg-gray-600 data-[active=true]:border-gray-600"
                         data-active={index + 1 <= playerFouls}
                       />
                     ))}
@@ -174,7 +173,11 @@ function TeamActionController(props: Props) {
         >
           <button
             type="button"
-            className={style.playerChangeButton}
+            className={clsx(
+              'text-2xl font-medium select-none w-full h-full flex gap-3 flex-col justify-center items-center border border-gray-300 rounded-md cursor-pointer text-center text-gray-500',
+              'hover:bg-gray-50 active:bg-gray-200',
+              'disabled:border-none disabled:bg-gray-100 disabled:text-gray-400',
+            )}
             disabled={selected.rosterId === null || quarter === 0}
             onClick={() => handleActionSelect(PlayingActionEnums.PLAYER_OUT)}
           >
@@ -183,7 +186,7 @@ function TeamActionController(props: Props) {
           </button>
         </SubPlayerFloatingList>
       </div>
-      <div className={style.actionsList}>
+      <div className="grid grid-cols-3 rounded-lg gap-2">
         {ACTIONS.map((action, index) =>
           action.type ? (
             <button
@@ -191,7 +194,12 @@ function TeamActionController(props: Props) {
               key={action.type}
               disabled={selected.rosterId === null || quarter === 0}
               data-selected={selected.actionType === action.type}
-              className={style.actionButton}
+              className={clsx(
+                'text-2xl font-medium select-none py-6 bg-primary-200 rounded-md cursor-pointer text-center',
+                'hover:bg-primary-300 active:bg-primary-400',
+                'disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
+                'data-[selected=true]:py-3.5 data-[selected=true]:bg-primary-600 data-[selected=true]:text-white data-[selected=true]:border-2 data-[selected=true]:border-white data-[selected=true]:outline-2 data-[selected=true]:outline-primary-600',
+              )}
               onClick={() => handleActionSelect(action.type)}
             >
               {action.name}

@@ -1,3 +1,159 @@
+@import "tailwindcss";
+
+@theme {
+  --spacing: 4px;
+
+  /* Custom animations */
+  --animate-spinner: spin 1.5s linear infinite;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
+  --radius-4xl: 20px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 6px 0 rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 9px 0 rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 4px 10px 0 rgba(15, 23, 42, 0.1);
+  --shadow-lg: 0 10px 15px 0 rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* Colors */
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
+
+  --color-primary-50: #e7fdeb;
+  --color-primary-100: #d4fcdb;
+  --color-primary-200: #aafac1;
+  --color-primary-300: #7ef0a9;
+  --color-primary-400: #5be19c;
+  --color-primary-500: #2bce8a;
+  --color-primary-600: #1fb182;
+  --color-primary-700: #159478;
+  --color-primary-800: #0d776a;
+  --color-primary-900: #086261;
+
+  --color-success-50: #f0fdec;
+  --color-success-100: #e2fcdb;
+  --color-success-200: #c0fab9;
+  --color-success-300: #94f093;
+  --color-success-400: #74e27c;
+  --color-success-500: #49cf60;
+  --color-success-600: #35b256;
+  --color-success-700: #24954d;
+  --color-success-800: #177843;
+  --color-success-900: #0e633c;
+
+  --color-info-50: #ebf6ff;
+  --color-info-100: #d6ecff;
+  --color-info-200: #add6ff;
+  --color-info-300: #83bdff;
+  --color-info-400: #65a6ff;
+  --color-info-500: #3281ff;
+  --color-info-600: #2463db;
+  --color-info-700: #1949b7;
+  --color-info-800: #0f3393;
+  --color-info-900: #09237a;
+
+  --color-warning-50: #fff9e6;
+  --color-warning-100: #fff5d2;
+  --color-warning-200: #ffe8a5;
+  --color-warning-300: #ffd878;
+  --color-warning-400: #ffc957;
+  --color-warning-500: #ffaf1f;
+  --color-warning-600: #db8d16;
+  --color-warning-700: #b76f0f;
+  --color-warning-800: #935309;
+  --color-warning-900: #7a3f05;
+
+  --color-red-50: #fef3eb;
+  --color-red-100: #fee8d8;
+  --color-red-200: #fecbb2;
+  --color-red-300: #fca88c;
+  --color-red-400: #fa866f;
+  --color-red-500: #f85040;
+  --color-red-600: #d52f2e;
+  --color-red-700: #b2202b;
+  --color-red-800: #8f1427;
+  --color-red-900: #770c25;
+
+  --color-purple-50: #f8ecfe;
+  --color-purple-100: #f2d9fd;
+  --color-purple-200: #e2b4fb;
+  --color-purple-300: #cb8cf5;
+  --color-purple-400: #b26deb;
+  --color-purple-500: #8f40de;
+  --color-purple-600: #6f2ebe;
+  --color-purple-700: #53209f;
+  --color-purple-800: #3a1480;
+  --color-purple-900: #280c6a;
+
+  --color-magenta-50: #fff1f0;
+  --color-magenta-100: #fedbda;
+  --color-magenta-200: #fdb6bb;
+  --color-magenta-300: #fa90a2;
+  --color-magenta-400: #f67496;
+  --color-magenta-500: #f04785;
+  --color-magenta-600: #ce337b;
+  --color-magenta-700: #ac2371;
+  --color-magenta-800: #8b1664;
+  --color-magenta-900: #730d5b;
+
+  /* Font sizes (overridden for 62.5% base) */
+  --font-size-xs: 1.2rem;
+  --font-size-xs--line-height: 1.8rem;
+  --font-size-sm: 1.4rem;
+  --font-size-sm--line-height: 2rem;
+  --font-size-base: 1.6rem;
+  --font-size-base--line-height: 2.4rem;
+  --font-size-lg: 1.8rem;
+  --font-size-lg--line-height: 2.8rem;
+  --font-size-xl: 2rem;
+  --font-size-xl--line-height: 3rem;
+  --font-size-2xl: 2.4rem;
+  --font-size-2xl--line-height: 3.2rem;
+  --font-size-3xl: 3.2rem;
+  --font-size-3xl--line-height: 4rem;
+  --font-size-4xl: 4rem;
+  --font-size-4xl--line-height: 5.6rem;
+  --font-size-5xl: 4.8rem;
+  --font-size-5xl--line-height: 6.4rem;
+  --font-size-6xl: 5.6rem;
+  --font-size-6xl--line-height: 7.2rem;
+  --font-size-7xl: 6.4rem;
+  --font-size-7xl--line-height: 8rem;
+}
+
+/* Scrollbar styles */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background-color: yellow;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: yellow;
+}
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+/* Reset */
 html,
 body,
 div,

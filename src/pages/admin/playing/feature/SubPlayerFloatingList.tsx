@@ -1,10 +1,7 @@
 import { flip, hide, offset, useDismiss, useFloating, useInteractions } from '@floating-ui/react';
 import { useState } from 'react';
 import clsx from 'clsx';
-import { fonts } from '@/style/typo.css.ts';
-import { flexs } from '@/style/container.css.ts';
 import { useGetMatchInfo } from '@/query/match.ts';
-import { subListStyle } from '@/pages/admin/playing/feature/css/sub-list.css.ts';
 
 type Props = {
   matchId: number;
@@ -43,21 +40,26 @@ export const SubPlayerFloatingList = ({ matchId, playingIds, teamType, onSelecte
       {open && (
         <div
           ref={refs.setFloating}
-          className={clsx(subListStyle.floatContainer)}
+          className="py-4 px-2 shadow-xl min-w-[190px] bg-white rounded-2xl border border-info-300"
           style={{ ...floatingStyles, zIndex: 10 }}
           {...getFloatingProps()}
         >
-          {playerList?.length === 0 && <span className={fonts.caption1.regular}>조회된 선수가 없습니다.</span>}
-          <div className={flexs({ dir: 'col', gap: '2' })}>
+          {playerList?.length === 0 && <span className="text-xs font-normal">조회된 선수가 없습니다.</span>}
+          <div className="flex items-center flex-col gap-0.5">
             {playerList?.map(player => (
               <button
                 key={player.player.playerId}
                 role="button"
-                className={subListStyle.listItem}
+                className={clsx(
+                  'text-xl font-medium w-full select-none cursor-pointer py-2.5 px-3 flex items-center gap-1.5 rounded-lg outline-none',
+                  'hover:bg-info-50 focus:bg-info-100',
+                )}
                 tabIndex={0}
                 onClick={() => onClickItem(player.player.playerId)}
               >
-                <span className={subListStyle.backNumber}>{player.player.number}</span>
+                <span className="text-lg font-semibold inline-block min-w-9 text-center text-info-600 rounded-sm bg-info-50">
+                  {player.player.number}
+                </span>
                 {player.player.name}
               </button>
             ))}

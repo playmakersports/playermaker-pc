@@ -5,10 +5,6 @@ import { convertHangulToQwerty } from 'es-hangul';
 import { flip, hide, offset, useDismiss, useFloating, useInteractions } from '@floating-ui/react';
 
 import { getTeamPlayerList } from '@/apis/team.ts';
-import { floatBox } from '@/style/box.css.ts';
-import { playerListStyle } from '@/pages/admin/feature/css/player-list.css.ts';
-import { fonts } from '@/style/typo.css.ts';
-import { flexs } from '@/style/container.css.ts';
 
 type PlayerInfo = {
   name: string;
@@ -114,17 +110,20 @@ export const PlayerListInput = (props: Props) => {
       {open && (
         <div
           ref={refs.setFloating}
-          className={clsx(playerListStyle.floatContainer, floatBox)}
+          className="py-4 px-2 rounded-3xl bg-white shadow-xl min-w-[190px]"
           style={{ ...floatingStyles, zIndex: 10 }}
           {...getFloatingProps()}
         >
-          {data?.length === 0 && <span className={fonts.caption1.regular}>조회된 선수가 없습니다.</span>}
-          <div className={flexs({ dir: 'col', gap: '2' })}>
+          {data?.length === 0 && <span className="text-xs font-normal">조회된 선수가 없습니다.</span>}
+          <div className="flex items-center flex-col gap-0.5">
             {currentList?.map((player, index) => (
               <button
                 key={player.playerId}
                 role="button"
-                className={playerListStyle.listItem}
+                className={clsx(
+                  'text-lg font-normal w-full select-none cursor-pointer py-1.5 px-3 flex items-center gap-1.5 rounded-2xl outline-none',
+                  'hover:bg-primary-50 focus:bg-primary-100',
+                )}
                 tabIndex={0}
                 onKeyUp={e => onKeyupOptionSelect(e, index)}
                 onClick={() => onClickItem({ number: player.number, name: player.name, playerId: player.playerId })}
@@ -134,7 +133,9 @@ export const PlayerListInput = (props: Props) => {
                   }
                 }}
               >
-                <span className={playerListStyle.backNumber}>{player.number}</span>
+                <span className="text-xs font-medium inline-block w-6 text-center bg-primary-500 text-white rounded-sm">
+                  {player.number}
+                </span>
                 {player.name}
               </button>
             ))}

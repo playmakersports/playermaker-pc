@@ -5,18 +5,14 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { getTeamList } from '@/apis/team.ts';
-import { fonts } from '@/style/typo.css.ts';
-import { matchCreateStyle as style } from '@/pages/admin/match/match.css.ts';
 import Button from '@/share/components/Button.tsx';
 import BaseInput from '@/share/components/inputs/BaseInput.tsx';
 import DateInput from '@/share/components/inputs/DateInput.tsx';
 import InputWrapper from '@/share/components/inputs/InputWrapper.tsx';
 import { lib } from '@/share/libs/dialog.tsx';
-import { flexs } from '@/style/container.css.ts';
-import { inputStyle } from '@/share/components/css/input.css.ts';
 import { PlayerListInput } from '@/pages/admin/feature/PlayerListInput.tsx';
 import { postMatchInfo, postMatchQuarter } from '@/apis/match.ts';
-import { spinner } from '@/share/components/css/ui.css.ts';
+import { spinner } from '@/share/components/spinner.ts';
 import CloseIcon from '@/assets/icons/common/Close20.svg?react';
 
 interface PlayerData {
@@ -41,6 +37,9 @@ interface InitialSubmitData {
   time: string;
   location: string;
 }
+
+const innerBoxClass =
+  'input-inner-box relative flex items-center w-full h-10 px-3 gap-2 rounded-lg border border-gray-200';
 
 function MatchCreateIndex() {
   const [stage, setStage] = useState(1);
@@ -88,7 +87,6 @@ function MatchCreateIndex() {
   });
 
   const onInitialSubmit = (data: InitialSubmitData) => {
-    // postMatchInfo
     initialMutation.mutate(
       {
         homeTeamId: 1,
@@ -170,16 +168,19 @@ function MatchCreateIndex() {
 
   return (
     <>
-      <div className={style.header}>
-        <h2 className={clsx(fonts.body1.semibold)}>새 경기 만들기</h2>
+      <div className="my-4">
+        <h2 className="text-xl font-semibold">새 경기 만들기</h2>
       </div>
-      <section className={style.formLayout}>
+      <section className="flex gap-4 h-full">
         <form onSubmit={initialForm.handleSubmit(onInitialSubmit)}>
-          <aside className={style.aside} data-staged={stage === 1}>
+          <aside
+            className="flex flex-col gap-4 p-4 pr-4 pl-0 min-w-[240px] h-full border-r border-gray-100 transition-all duration-[250ms] data-[staged=true]:min-w-[560px]"
+            data-staged={stage === 1}
+          >
             <InputWrapper title="상대 팀" required>
               <select
                 disabled={stage === 2}
-                className={clsx(fonts.body3.regular, inputStyle.innerBox)}
+                className={clsx('text-base font-normal', innerBoxClass)}
                 {...initialForm.register('awayTeamId', {
                   required: { message: '상대 팀을 선택해 주세요', value: true },
                 })}
@@ -199,7 +200,6 @@ function MatchCreateIndex() {
                 required: { message: '경기일을 선택해 주세요', value: true },
               })}
             />
-            {/*<input type="time" />*/}
             <BaseInput
               disabled={stage === 2}
               type="text"
@@ -212,7 +212,7 @@ function MatchCreateIndex() {
             />
             <BaseInput type="text" title="경기 장소" disabled={stage === 2} {...initialForm.register('location')} />
 
-            <div className={fonts.body3.regular}>
+            <div className="text-base font-normal">
               {Object.values(errors).map(err => (
                 <p key={err.message}>{err?.message}</p>
               ))}
@@ -228,25 +228,28 @@ function MatchCreateIndex() {
           </aside>
         </form>
         <form onSubmit={handleSubmit(onPlayersSubmit)}>
-          <div className={style.formContent} data-staged={stage === 2}>
+          <div
+            className="form-content relative flex-1 py-4 flex justify-around gap-5"
+            data-staged={stage === 2}
+          >
             {teamInfo.map(team => (
-              <div key={team.type} className={flexs({ dir: 'col', gap: '16', align: 'start', justify: 'start' })}>
-                <h3 className={clsx(fonts.body2.semibold, style.sectionTitle)}>{team.type.toUpperCase()} PLAYERS</h3>
-                <div className={flexs({ dir: 'col', gap: '8' })}>
+              <div key={team.type} className="flex items-start flex-col justify-start gap-4">
+                <h3 className="text-lg font-semibold mb-4">{team.type.toUpperCase()} PLAYERS</h3>
+                <div className="flex items-center flex-col justify-center gap-2">
                   {team.fields.map((field, index) => (
-                    <div key={field.id} className={clsx(flexs({ justify: 'start', gap: '12' }), style.playerRow)}>
-                      <div className={style.playerNumberInput}>
-                        <label className={clsx(fonts.caption1.medium, style.inputLabel)}>번호</label>
+                    <div key={field.id} className="flex items-end justify-start gap-3">
+                      <div className="w-[60px]">
+                        <label className="text-xs font-medium block mb-1">번호</label>
                         <input
-                          className={clsx(fonts.body4.regular, inputStyle.innerBox)}
+                          className={clsx('text-sm font-normal', innerBoxClass)}
                           type="text"
                           {...register(`${team.type === 'home' ? 'homePlayers' : 'awayPlayers'}.${index}.number`, {
                             valueAsNumber: true,
                           })}
                         />
                       </div>
-                      <div className={style.playerNameInput}>
-                        <label className={clsx(fonts.caption1.medium, style.inputLabel)}>선수명</label>
+                      <div className="w-[152px]">
+                        <label className="text-xs font-medium block mb-1">선수명</label>
                         <PlayerListInput
                           teamId={team.type === 'home' ? watch('homeTeamId') : watch('awayTeamId')}
                           searchKey={watch(`${team.type === 'home' ? 'homePlayers' : 'awayPlayers'}.${index}.name`)}
@@ -267,14 +270,14 @@ function MatchCreateIndex() {
                         >
                           <input
                             autoComplete="off"
-                            className={clsx(fonts.body4.regular, inputStyle.innerBox)}
+                            className={clsx('text-sm font-normal', innerBoxClass)}
                             type="text"
                             placeholder="이름을 입력해 주세요"
                             {...register(`${team.type === 'home' ? 'homePlayers' : 'awayPlayers'}.${index}.name`)}
                           />
                         </PlayerListInput>
                       </div>
-                      <div className={flexs({ gap: '4' })}>
+                      <div className="flex items-center justify-center gap-1">
                         <div onClick={() => team.remove(index)} aria-label="선수 삭제">
                           <CloseIcon />
                         </div>

@@ -1,4 +1,3 @@
-import { playingStyle as style } from '@/pages/admin/playing/playing.css.ts';
 import { type GameEvent } from '@/store/game-events-atom.ts';
 import { useEffect, useRef } from 'react';
 
@@ -49,8 +48,12 @@ function RunningScoreTable(props: Props) {
   }, [awayRunningScore]);
 
   return (
-    <ul className={style.playingScoreTable} ref={tableRef}>
-      <li className={style.scoreTableHeader}>
+    <ul
+      className="relative h-[75vh] border border-gray-300 rounded-lg overflow-auto"
+      style={{ width: 'var(--center-width)' }}
+      ref={tableRef}
+    >
+      <li className="text-base font-semibold sticky top-0 py-1.5 flex justify-around bg-gray-100 border-b border-gray-300 text-center">
         <span>HOME</span>
         <span>AWAY</span>
       </li>
@@ -60,10 +63,14 @@ function RunningScoreTable(props: Props) {
         const awayPlayer = awayPlayersByScore[currentScore];
 
         return (
-          <li key={index} className={style.scoreTableCell}>
+          <li key={index} className="text-lg font-normal border-b border-gray-200 text-center min-h-9 grid grid-cols-[1fr_auto_auto_1fr] items-center">
             <span>{homePlayer}</span>
-            <span className={style.scoreTablePointCell}>{currentScore}</span>
-            <span className={style.scoreTablePointCell}>{currentScore}</span>
+            <span className="score-table-point-cell text-base font-semibold py-1.5 min-w-10 bg-gray-50 text-gray-600 border-l border-gray-200 [font-feature-settings:'cv02','cv04','cv06','cv09','cv13']">
+              {currentScore}
+            </span>
+            <span className="score-table-point-cell text-base font-semibold py-1.5 min-w-10 bg-gray-50 text-gray-600 border-l border-gray-200 [font-feature-settings:'cv02','cv04','cv06','cv09','cv13']">
+              {currentScore}
+            </span>
             <span>{awayPlayer}</span>
           </li>
         );

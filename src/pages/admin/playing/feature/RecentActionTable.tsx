@@ -1,13 +1,9 @@
 import { memo, useCallback, useEffect } from 'react';
-import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { groupBy, orderBy } from 'es-toolkit';
 
-import { fonts } from '@/style/typo.css.ts';
-import { flexs } from '@/style/container.css.ts';
 import Button from '@/share/components/Button.tsx';
 import Icons from '@/share/common/Icons.tsx';
-import { recentActionStyle as style } from '@/pages/admin/playing/feature/css/recent-action-list.css.ts';
 import { gameEventsAtom, pausedEventsAtom, popEventAtom } from '@/store/game-events-atom.ts';
 import { PlayingActionEnums } from '@/enums/playing.ts';
 import { calculateGameTime, timestampToTimerMS } from '@/share/libs/format.ts';
@@ -65,16 +61,9 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
 
   return (
     <div>
-      <div
-        className={clsx(
-          style.title,
-          flexs({
-            justify: 'spb',
-          }),
-        )}
-      >
-        <h2 className={fonts.body1.semibold}>진행상황</h2>
-        <div className={style.hover}>
+      <div className="my-6 mb-3 flex items-center justify-between">
+        <h2 className="text-xl font-semibold">진행상황</h2>
+        <div className="hover-parent relative">
           <Button
             type="button"
             size="small"
@@ -84,7 +73,7 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
             onClick={handleUndoAction}
             disabled={!(quarterActions[quarter]?.length > 1)}
           ></Button>
-          <div className={style.hoverInfo}>
+          <div className="hover-info text-sm font-medium absolute flex items-center right-0 top-full w-max mt-1.5 py-1 px-2 bg-gray-500 text-white rounded-sm gap-1 opacity-0 transition-[opacity,transform] duration-[200ms,300ms] -translate-y-full">
             실행취소
             <span className="key">
               <Icons name="command" w="regular" t="round" size={14} />
@@ -94,14 +83,17 @@ function RecentActionTable({ quarter, teamType, playerList }: Props) {
         </div>
       </div>
 
-      <ul className={style.container}>
+      <ul className="grid grid-cols-2 grid-rows-[repeat(6,1fr)] grid-flow-col gap-x-5 gap-y-1">
         {recent.map(action => {
           return (
-            <li key={`${action.timestamp}-${action.rosterId}-${action.actionType}`} className={style.action}>
-              <span className={style.time}>
+            <li
+              key={`${action.timestamp}-${action.rosterId}-${action.actionType}`}
+              className="text-base font-normal max-w-[300px] flex gap-2 items-center [font-feature-settings:'cv02','cv04','cv06','cv09','cv13'] tabular-nums"
+            >
+              <span className="text-base font-medium mr-[-2px] min-w-[46px] text-gray-500 tracking-[-0.25px]">
                 {timestampToTimerMS(calculateGameTime(action.timestamp, quarterStartTimestamp, pausedEvents, quarter))}
               </span>
-              <span className={style.playerNum}>
+              <span className="text-sm font-semibold min-w-[38px] max-w-[38px] text-center p-[1px] bg-gray-200 text-gray-600 rounded-sm">
                 {playerList?.find(player => player.rosterId === action.rosterId)?.playerNo}
               </span>
               <span>{playerList?.find(player => player.rosterId === action.rosterId)?.playerName}</span>

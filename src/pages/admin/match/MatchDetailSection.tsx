@@ -8,10 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useGetMatchRoster } from '@/query/match.ts';
 
 import { getMatchInfoDetail } from '@/apis/match.ts';
-import { align, fonts } from '@/style/typo.css.ts';
-import { matchDetailStyle as style } from '@/pages/admin/match/match-detail.css.ts';
-import { flexRatio, flexs, fullwidth } from '@/style/container.css.ts';
-import { spinner } from '@/share/components/css/ui.css.ts';
+import { spinner } from '@/share/components/spinner.ts';
 import Button from '@/share/components/Button.tsx';
 import CheckIcon from '@/assets/icons/common/Check.svg?react';
 
@@ -57,7 +54,7 @@ const MatchDetailSection = (props: Props) => {
 
   if (isLoading) {
     return (
-      <div className={style.container}>
+      <div className="pt-8 px-10 flex flex-col gap-7">
         <div
           className={spinner({
             size: 28,
@@ -73,29 +70,29 @@ const MatchDetailSection = (props: Props) => {
     const { homeTeam, awayTeam, homeScore, awayScore, status, matchDate, location } = data.recordMatchResponseDto;
 
     return (
-      <div className={style.container}>
+      <div className="pt-8 px-10 flex flex-col gap-7">
         <div>
-          <h2 className={clsx(flexs({ justify: 'around' }))}>
-            <span className={clsx(flexRatio['1'], fonts.head5.semibold, align.center)}>{homeTeam.teamName}</span>
-            <div className={clsx(fonts.head5.medium, flexs({ gap: '24', align: 'start' }))}>
-              <div style={{ width: '60px' }} className={align.right}>
+          <h2 className="flex items-center justify-around">
+            <span className="flex-1 text-3xl font-semibold text-center">{homeTeam.teamName}</span>
+            <div className="text-3xl font-medium flex items-start justify-center gap-6">
+              <div style={{ width: '60px' }} className="text-right">
                 {homeScore || '--'}
               </div>
-              <div className={flexs({ dir: 'col', gap: '8' })}>
-                <p className={clsx(fonts.body2.medium)}>{status === 'BEFORE' ? '경기전' : '경기종료'}</p>
+              <div className="flex items-center flex-col justify-center gap-2">
+                <p className="text-lg font-medium">{status === 'BEFORE' ? '경기전' : '경기종료'}</p>
               </div>
-              <div style={{ width: '60px' }} className={align.left}>
+              <div style={{ width: '60px' }} className="text-left">
                 {awayScore || '--'}
               </div>
             </div>
-            <span className={clsx(flexRatio['1'], fonts.head5.semibold, align.center)}>{awayTeam.teamName}</span>
+            <span className="flex-1 text-3xl font-semibold text-center">{awayTeam.teamName}</span>
           </h2>
-          <div className={style.description}>
+          <div className="text-lg font-normal flex items-center flex-col justify-center gap-1 mt-4.5 text-gray-500">
             <p>{format(matchDate, 'M월 d일 ccc HH:mm', { locale: ko })}</p>
             {location}
           </div>
         </div>
-        <div className={flexs({ gap: '24', justify: 'center' })}>
+        <div className="flex items-center justify-center gap-6">
           {status === 'BEFORE' && (
             <Button
               type="button"
@@ -109,22 +106,28 @@ const MatchDetailSection = (props: Props) => {
           )}
         </div>
 
-        <div className={flexs({ gap: '24', align: 'start' })}>
+        <div className="flex items-start justify-center gap-6">
           {players &&
             Object.entries(groupBy(players, obj => obj.teamType)).map(([team, players]) => (
-              <div key={team} className={clsx(fullwidth, flexs({ dir: 'col', gap: '8' }))}>
-                <ul className={flexs({ dir: 'col', gap: '4', align: 'start' })}>
+              <div key={team} className="w-full flex items-center flex-col justify-center gap-2">
+                <ul className="flex items-start flex-col justify-center gap-1">
                   {players.map(player => (
-                    <li key={player.rosterId} className={flexs({ gap: '16' })}>
-                      <div className={flexs({ gap: '8' })}>
-                        <span className={style.backNumber}>{player.player.number}</span>
-                        <span className={fonts.body1.regular}>{player.player.name}</span>
+                    <li key={player.rosterId} className="flex items-center justify-center gap-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="text-base font-semibold inline-block min-w-10 bg-gray-100 rounded-sm text-gray-700 text-center [font-feature-settings:'cv02','cv04','cv06','cv09','cv13']">
+                          {player.player.number}
+                        </span>
+                        <span className="text-xl font-normal">{player.player.name}</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => onCheck(player.player.playerId, player.rosterId, player.teamType)}
                         data-active={starter.some(s => s.playerId === player.player.playerId)}
-                        className={style.starterButton}
+                        className={clsx(
+                          'text-base font-semibold flex items-center justify-center gap-1 cursor-pointer py-1 px-1.5 rounded-md',
+                          'data-[active=true]:bg-primary-300',
+                          'data-[active=false]:text-gray-400',
+                        )}
                       >
                         <CheckIcon /> 선발
                       </button>

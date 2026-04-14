@@ -6,9 +6,6 @@ import { omitBy } from 'es-toolkit';
 
 import { postMatchStatAdd } from '@/apis/match.ts';
 import Button from '@/share/components/Button';
-import { summaryStyle } from './css/quarter-summary.css';
-import { fonts } from '@/style/typo.css';
-import { flexs } from '@/style/container.css';
 import { gameEventsAtom } from '@/store/game-events-atom.ts';
 import { PlayingActionTypeName } from '@/pages/admin/playing/feature/RecentActionTable.tsx';
 import { timestampToTimerMS } from '@/share/libs/format.ts';
@@ -72,15 +69,21 @@ function QuarterSummary(props: Props) {
   }, []);
 
   return (
-    <section data-open={isOpen} className={summaryStyle.container}>
-      <div className={summaryStyle.inner} data-open={isOpen}>
-        <div className={flexs({ justify: 'spb' })}>
+    <section
+      data-open={isOpen}
+      className="fixed left-0 top-0 w-screen h-screen bg-black/25 opacity-0 transition-opacity duration-300 ease-in-out z-50 flex px-7 justify-center items-center data-[open=true]:opacity-100"
+    >
+      <div
+        className="w-full max-w-[1200px] h-[80vh] max-h-[80vh] bg-white rounded-3xl pt-8 px-8 shadow-lg translate-y-10 opacity-0 transition-[transform,opacity] duration-[250ms,300ms] ease-in-out flex flex-col data-[open=true]:translate-y-0 data-[open=true]:opacity-100"
+        data-open={isOpen}
+      >
+        <div className="flex items-center justify-between">
           <div>
-            <h2 className={fonts.body1.semibold}>{quarter}쿼터 종료: 기록을 확인해 보세요</h2>
-            <p className={fonts.body4.regular}>기록을 선택하면, 내용을 수정할 수 있어요</p>
+            <h2 className="text-xl font-semibold">{quarter}쿼터 종료: 기록을 확인해 보세요</h2>
+            <p className="text-sm font-normal">기록을 선택하면, 내용을 수정할 수 있어요</p>
           </div>
-          <div className={flexs({ gap: '8' })}>
-            <div className={summaryStyle.timerText}>휴식 {timestampToTimerMS(restTime * 1000)}</div>
+          <div className="flex items-center justify-center gap-2">
+            <div className="text-base font-normal text-primary-600">휴식 {timestampToTimerMS(restTime * 1000)}</div>
             <Button type="button" size="large" theme="primary" onClick={onClickQuarterStart}>
               쿼터 시작
             </Button>
@@ -92,8 +95,8 @@ function QuarterSummary(props: Props) {
           </div>
         </div>
 
-        <div className={summaryStyle.eventContainer}>
-          <ul className={summaryStyle.eventList}>
+        <div className="flex mx-[-4px] mt-5 h-full gap-5 justify-between flex-1 min-h-0">
+          <ul className="w-[240px] inline-flex flex-col gap-3 overflow-y-auto h-full pr-3 pb-8">
             {quarterEvents
               .filter(evt => evt.teamType !== null && !/(^\d[SE])$/.test(evt.actionType))
               .map(event => {
@@ -106,17 +109,17 @@ function QuarterSummary(props: Props) {
                 return (
                   <li
                     key={eventId}
-                    className={summaryStyle.eventCard}
+                    className="text-sm font-normal cursor-pointer select-none py-3 px-4 rounded-2xl bg-gray-100 border border-transparent data-[selected=true]:border-primary-500 data-[selected=true]:bg-white data-[selected=true]:text-primary-700"
                     data-selected={selected === eventId}
                     onClick={() => setSelected(eventId)}
                   >
-                    <p className={flexs({ justify: 'spb' })}>
+                    <p className="flex items-center justify-between">
                       <span>
                         {playerNo} {playerName}
                       </span>
                       <span>{PlayingActionTypeName[event.actionType]}</span>
                     </p>
-                    <p className={flexs({ justify: 'spb' })}>
+                    <p className="flex items-center justify-between">
                       <span>{timestampToTimerMS(event.timestamp - quarterStartTime)}</span>
                       <span>{teamName?.[event.teamType as 'home' | 'away']}</span>
                     </p>
@@ -124,15 +127,19 @@ function QuarterSummary(props: Props) {
                 );
               })}
           </ul>
-          <div className={summaryStyle.eventFormSection}>
-            <div className={flexs({ dir: 'col', gap: '8', align: 'start' })}>
-              <h3 className={fonts.body3.medium}>선수 변경</h3>
-              <div className={summaryStyle.radioCards}>
+          <div className="flex-1 flex flex-col gap-7">
+            <div className="flex items-start flex-col justify-center gap-2">
+              <h3 className="text-base font-medium">선수 변경</h3>
+              <div className="grid w-full grid-cols-4 gap-3">
                 {players.map(player => (
-                  <label htmlFor={`${player.rosterId}+${player.playerName}`} className={summaryStyle.radioCard}>
+                  <label
+                    key={`${player.rosterId}+${player.playerName}`}
+                    htmlFor={`${player.rosterId}+${player.playerName}`}
+                    className="radio-card text-sm font-normal cursor-pointer flex justify-between items-center gap-1 py-3 px-4 rounded-lg bg-transparent border border-gray-300"
+                  >
                     <input type="radio" name="player" id={player.rosterId.toString()} style={{ display: 'none' }} />
-                    <p className={flexs({ dir: 'col', align: 'start' })}>
-                      <span className={fonts.body3.medium}>
+                    <p className="flex items-start flex-col justify-center">
+                      <span className="text-base font-medium">
                         ({player.playerNo}) {player.playerName}
                       </span>
                       <span>{teamName?.[player.teamType]}</span>
@@ -143,13 +150,17 @@ function QuarterSummary(props: Props) {
               </div>
             </div>
 
-            <div className={flexs({ dir: 'col', gap: '4', align: 'start' })}>
-              <h3 className={fonts.body3.medium}>액션 타입 변경</h3>
-              <div className={summaryStyle.radioCards}>
+            <div className="flex items-start flex-col justify-center gap-1">
+              <h3 className="text-base font-medium">액션 타입 변경</h3>
+              <div className="grid w-full grid-cols-4 gap-3">
                 {Object.entries(editableActionTypes).map(([actionKey, actionValue]) => (
-                  <label key={actionKey} htmlFor={actionKey} className={summaryStyle.radioCard}>
+                  <label
+                    key={actionKey}
+                    htmlFor={actionKey}
+                    className="radio-card text-sm font-normal cursor-pointer flex justify-between items-center gap-1 py-3 px-4 rounded-lg bg-transparent border border-gray-300"
+                  >
                     <input type="radio" name="actionType" id={actionKey} style={{ display: 'none' }} />
-                    <span className={fonts.body3.medium}>{PlayingActionTypeName[actionValue!]}</span>
+                    <span className="text-base font-medium">{PlayingActionTypeName[actionValue!]}</span>
                     <Icons name="check" size={16} w="bold" t="straight" />
                   </label>
                 ))}

@@ -6,18 +6,18 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { groupBy, mapValues, sumBy } from 'es-toolkit';
 import { useGetMatchInfo, useGetMatchRoster } from '@/query/match.ts';
 
-import { fonts } from '@/style/typo.css.ts';
-import { playingStyle as style } from '@/pages/admin/playing/playing.css.ts';
 import { addEventAtom, gameEventsAtom, pausedEventsAtom, timerAtom } from '@/store/game-events-atom.ts';
 import RunningScoreTable from '@/pages/admin/playing/feature/RunningScoreTable.tsx';
 import { type PlayingActionType } from '@/enums/playing.ts';
-import { flexs } from '@/style/container.css.ts';
 import { timestampToTimerMS } from '@/share/libs/format.ts';
 import TeamActionController from '@/pages/admin/playing/feature/TeamActionController.tsx';
 import QuarterSummary from './feature/QuarterSummary';
 import Icons from '@/share/common/Icons.tsx';
 import type { PlayingStarter } from '../match/MatchDetailSection';
 import { lib } from '@/share/libs/dialog';
+
+const PLAYING_BTN_BASE =
+  'text-2xl font-medium inline-flex items-center gap-[3px] w-full py-2 px-3.5 text-white rounded-lg cursor-pointer border-none disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed';
 
 function PlayingIdIndex() {
   const { state } = useLocation();
@@ -46,7 +46,6 @@ function PlayingIdIndex() {
   useEffect(() => {
     if (state?.starter) {
       const { starter } = state as { starter: PlayingStarter[] };
-      // 선발 선수 설정
       const playersGroupByTeamType = groupBy(starter, obj => obj.teamType);
       setPlaying({
         home: playersGroupByTeamType['home']?.map(p => p.rosterId),
@@ -58,9 +57,6 @@ function PlayingIdIndex() {
     }
   }, [state]);
 
-  /**
-   * 팀 점수 집계 함수
-   */
   const teamScores = () => {
     return mapValues(
       groupBy(
@@ -71,9 +67,6 @@ function PlayingIdIndex() {
     );
   };
 
-  /**
-   * 팀 파울 집계 함수
-   */
   const teamFouls = useMemo(() => {
     const { PF: personalFouls } = groupBy(gameEvents, event => event.actionType);
     return groupBy(
@@ -106,7 +99,6 @@ function PlayingIdIndex() {
     const now = Date.now();
 
     if (timer.isRunning) {
-      // 타이머 일시정지
       const currentElapsed = timer.startTimestamp ? now - timer.startTimestamp : 0;
       setTimer({
         isRunning: false,
@@ -122,7 +114,6 @@ function PlayingIdIndex() {
         },
       ]);
     } else {
-      // 타이머 시작
       setTimer({
         isRunning: true,
         startTimestamp: now,
@@ -211,7 +202,7 @@ function PlayingIdIndex() {
         데이터
       </button>
       <div
-        className={fonts.body4.regular}
+        className="text-sm font-normal"
         style={{
           display: hideDataView ? 'none' : 'block',
           padding: '48px 10px 12px',
@@ -224,13 +215,17 @@ function PlayingIdIndex() {
       >
         <p>{JSON.stringify(gameEvents).replaceAll('}', '}\n')}</p>
       </div>
-      <section className={style.pageSection} style={{ flex: 1 }}>
-        <header className={style.layoutContainer}>
-          <div className={style.headerTeam}>
-            <p className={flexs({ gap: '4' })}>
-              <span className={style.teamTypeFlag}>HOME</span> {data?.recordMatchResponseDto.homeTeam.teamName}
+      <section
+        className="flex gap-8 flex-col p-4 h-screen"
+        style={{ flex: 1, ['--center-width' as string]: 'max(140px, 16.5vw)' }}
+      >
+        <header className="flex gap-4 justify-between">
+          <div className="text-2xl font-medium flex-1 text-center">
+            <p className="flex items-center justify-center gap-1">
+              <span className="text-sm font-semibold py-0.5 px-2 bg-gray-500 rounded-[3px] text-white">HOME</span>{' '}
+              {data?.recordMatchResponseDto.homeTeam.teamName}
             </p>
-            <ul className={style.headerTeamFouls}>
+            <ul className="header-team-fouls flex mt-1 justify-center gap-1">
               {[1, 2, 3, 4, 5].map(num => (
                 <li key={`home-fouls-${num}`} data-active={teamFouls.home?.length >= num}>
                   {num}
@@ -238,22 +233,33 @@ function PlayingIdIndex() {
               ))}
             </ul>
           </div>
-          <div className={style.headerCenter}>
+          <div
+            className="text-4xl font-semibold flex items-center justify-between gap-3 text-center [font-feature-settings:'cv02','cv04','cv06','cv09','cv13']"
+            style={{ width: 'var(--center-width)' }}
+          >
             <div style={{ flex: 1 }}>{teamScores().home}</div>
             {quarter === 0 ? (
-              <div className={style.playingScore}>경기시작 전</div>
+              <div className="text-2xl font-semibold py-2 min-w-[152px] border-2 border-gray-300 text-gray-700 rounded-xl text-center tabular-nums tracking-[-0.7px]">
+                경기시작 전
+              </div>
             ) : (
-              <div className={clsx(style.playingScore, { [style.playingTimeout]: !timer.isRunning })}>
+              <div
+                className={clsx(
+                  'text-2xl font-semibold py-2 min-w-[152px] border-2 border-gray-300 text-gray-700 rounded-xl text-center tabular-nums tracking-[-0.7px]',
+                  !timer.isRunning && 'bg-red-500 text-white border-transparent',
+                )}
+              >
                 {quarter}Q - <span className="time">{timestampToTimerMS(currentTime)}</span>
               </div>
             )}
             <div style={{ flex: 1 }}>{teamScores().away}</div>
           </div>
-          <div className={style.headerTeam}>
-            <p className={flexs({ gap: '4' })}>
-              <span className={style.teamTypeFlag}>AWAY</span> {data?.recordMatchResponseDto.awayTeam.teamName}
+          <div className="text-2xl font-medium flex-1 text-center">
+            <p className="flex items-center justify-center gap-1">
+              <span className="text-sm font-semibold py-0.5 px-2 bg-gray-500 rounded-[3px] text-white">AWAY</span>{' '}
+              {data?.recordMatchResponseDto.awayTeam.teamName}
             </p>
-            <ul className={style.headerTeamFouls}>
+            <ul className="header-team-fouls flex mt-1 justify-center gap-1">
               {[1, 2, 3, 4, 5].map(num => (
                 <li key={`away-fouls-${num}`} data-active={teamFouls.away?.length >= num}>
                   {num}
@@ -262,8 +268,8 @@ function PlayingIdIndex() {
             </ul>
           </div>
         </header>
-        <div className={style.layoutContainer}>
-          <div className={style.controlCards}>
+        <div className="flex gap-4 justify-between">
+          <div className="flex flex-1 flex-col gap-10">
             <TeamActionController
               teamType="home"
               playerList={playerList ?? []}
@@ -273,7 +279,7 @@ function PlayingIdIndex() {
               quarter={quarter}
             />
           </div>
-          <div className={flexs({ dir: 'col', gap: '12' })}>
+          <div className="flex items-center flex-col justify-center gap-3">
             <RunningScoreTable
               maxScore={Math.max(teamScores().home || 0, teamScores().away || 0)}
               scores={gameEvents
@@ -283,25 +289,36 @@ function PlayingIdIndex() {
                   playerNo: playerList?.find(p => p.rosterId === event.rosterId)?.playerNo || -1,
                 }))}
             />
-            <div className={flexs({ dir: 'col', gap: '8' })}>
+            <div className="flex items-center flex-col justify-center gap-2">
               {timer.isRunning && (
-                <button className={style.button.red} disabled={!timer.isRunning} onClick={handleQuarterEnd}>
+                <button
+                  className={clsx(PLAYING_BTN_BASE, 'bg-red-500 active:bg-red-600')}
+                  disabled={!timer.isRunning}
+                  onClick={handleQuarterEnd}
+                >
                   쿼터종료
                 </button>
               )}
               {currentTime !== 0 && (
-                <button className={style.button.warning} onClick={handleTimeOut}>
+                <button
+                  className={clsx(PLAYING_BTN_BASE, 'bg-warning-500 active:bg-warning-600')}
+                  onClick={handleTimeOut}
+                >
                   {timer.isRunning ? '타임아웃' : '재개'}
                 </button>
               )}
               {!timer.isRunning && currentTime === 0 && (
-                <button className={style.button.info} disabled={timer.isRunning} onClick={handleQuarterStart}>
+                <button
+                  className={clsx(PLAYING_BTN_BASE, 'bg-info-500 active:bg-info-600')}
+                  disabled={timer.isRunning}
+                  onClick={handleQuarterStart}
+                >
                   시작 <Icons name="running" t="straight" w="bold" size={26} />
                 </button>
               )}
             </div>
           </div>
-          <div className={style.controlCards}>
+          <div className="flex flex-1 flex-col gap-10">
             <TeamActionController
               teamType="away"
               playerList={playerList ?? []}

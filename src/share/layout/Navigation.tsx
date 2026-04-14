@@ -1,5 +1,3 @@
-import { layoutStyle as style } from './layout.css.ts';
-import { fonts } from '@/style/typo.css.ts';
 import { Link, useLocation } from 'react-router';
 
 function Navigation() {
@@ -11,20 +9,24 @@ function Navigation() {
   ];
 
   return (
-    <nav className={style.navContainer}>
-      <div className={style.navInner}>
-        <ul className={style.navMenu}>
+    <nav className="w-full h-[60px] border-b border-gray-100">
+      <div className="mx-auto px-4 flex justify-between min-w-[1280px] max-w-[1280px] w-full h-full">
+        <ul className="flex gap-4">
           {MENUS.map(menu => (
             <li key={menu.path}>
-              <Link to={menu.path} className={style.navItems} data-active={pathname.includes(menu.path)}>
+              <Link
+                to={menu.path}
+                className="text-sm font-normal flex items-center px-2.5 pt-1 h-full border-b-[3px] border-transparent active:bg-gray-100 data-[active=true]:font-semibold data-[active=true]:text-primary-600 data-[active=true]:border-primary-600"
+                data-active={pathname.includes(menu.path)}
+              >
                 {menu.name}
               </Link>
             </li>
           ))}
         </ul>
-        <div className={style.navUser}>
-          <p className={fonts.body4.regular}>SPABA(매니저)</p>
-          <p className={fonts.body4.medium}>유저명</p>
+        <div className="flex gap-1.5 items-center">
+          <p className="text-sm font-normal">SPABA(매니저)</p>
+          <p className="text-sm font-medium">유저명</p>
         </div>
       </div>
     </nav>

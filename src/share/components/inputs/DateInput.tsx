@@ -4,7 +4,6 @@ import { flip, hide, offset, useDismiss, useFloating } from '@floating-ui/react'
 import useCalendar from '@/share/hooks/useCalendar.ts';
 
 import BaseInput from '@/share/components/inputs/BaseInput.tsx';
-import { datePickerStyle } from '@/share/components/css/date.css.ts';
 import { NumberFlowInput } from './NumberFlowInput';
 import LeftArrow from '@/assets/icons/arrow/LeftArrow.svg?react';
 import RightArrow from '@/assets/icons/arrow/RightArrow.svg?react';
@@ -20,10 +19,7 @@ import {
   isToday,
   subMonths,
 } from 'date-fns';
-import { flexs, fullwidth } from '@/style/container.css.ts';
 import clsx from 'clsx';
-import { align, fonts } from '@/style/typo.css.ts';
-import { theme } from '@/style/theme.css.ts';
 
 interface DateInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'ref' | 'value' | 'defaultValue'> {
@@ -124,10 +120,10 @@ const DateInput = (props: DateInputProps & { ref?: React.Ref<HTMLInputElement> }
       </div>
       {open && (
         <div role="dialog" ref={refs.setFloating} style={{ ...floatingStyles, zIndex: 5 }}>
-          <div className={datePickerStyle.container}>
-            <div className={datePickerStyle.calendarHeader}>
-              <div className={flexs({ justify: 'center', gap: '8' })}>
-                <div className={clsx(flexs(), fonts.body2.semibold)}>
+          <div className="rounded-xl p-4 shadow-lg bg-white">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-center text-lg font-semibold">
                   <NumberFlowInput
                     aria-label="연도 입력"
                     pattern="[0-9]*"
@@ -142,10 +138,8 @@ const DateInput = (props: DateInputProps & { ref?: React.Ref<HTMLInputElement> }
                         const newDate = new Date(newYear, monthValue, currentDate.getDate());
                         if (pickType === 'ONLY_PAST' && isFuture(newDate)) {
                           setCurrentDateValue();
-                          // trigger('미래로 날짜를 설정할 수 없어요.', { type: 'error' });
                         } else if (pickType === 'ONLY_FUTURE' && isPast(newDate) && !isToday(newDate)) {
                           setCurrentDateValue();
-                          // trigger('과거로 날짜를 설정할 수 없어요.', { type: 'error' });
                         } else {
                           setCurrentDateValue(new Date(newYear, monthValue - 1, currentDate.getDate()));
                         }
@@ -156,7 +150,7 @@ const DateInput = (props: DateInputProps & { ref?: React.Ref<HTMLInputElement> }
                   />
                   년
                 </div>
-                <div className={clsx(flexs(), fonts.body2.semibold)}>
+                <div className="flex items-center justify-center text-lg font-semibold">
                   <NumberFlowInput
                     min={1}
                     max={12}
@@ -182,10 +176,8 @@ const DateInput = (props: DateInputProps & { ref?: React.Ref<HTMLInputElement> }
                         const newDate = new Date(yearValue, newMonth, currentDate.getDate());
                         if (pickType === 'ONLY_PAST' && isFuture(newDate)) {
                           setCurrentDateValue();
-                          // trigger('미래로 날짜를 설정할 수 없어요.', { type: 'error' });
                         } else if (pickType === 'ONLY_FUTURE' && isPast(newDate) && !isToday(newDate)) {
                           setCurrentDateValue();
-                          // trigger('과거로 날짜를 설정할 수 없어요.', { type: 'error' });
                         } else {
                           setCurrentDateValue(new Date(yearValue, newMonth - 1, currentDate.getDate()));
                         }
@@ -197,7 +189,7 @@ const DateInput = (props: DateInputProps & { ref?: React.Ref<HTMLInputElement> }
                   월
                 </div>
               </div>
-              <div className={flexs({ justify: 'center' })}>
+              <div className="flex items-center justify-center">
                 <button
                   type="button"
                   disabled={pickType === 'ONLY_FUTURE' && isSameMonth(currentDate, new Date())}
@@ -215,26 +207,27 @@ const DateInput = (props: DateInputProps & { ref?: React.Ref<HTMLInputElement> }
               </div>
             </div>
 
-            <div className={flexs({ dir: 'col', justify: 'spb', gap: '8' })}>
-              <div className={clsx(fullwidth, flexs({ justify: 'spb' }))}>
+            <div className="flex items-center flex-col justify-between gap-2">
+              <div className="w-full flex items-center justify-between">
                 {dayList.map(value => (
-                  <p
-                    key={value}
-                    className={clsx(fullwidth, align.center, fonts.body4.medium)}
-                    style={{ color: theme.color.gray['400'] }}
-                  >
+                  <p key={value} className="w-full text-center text-sm font-medium text-gray-400">
                     {value}
                   </p>
                 ))}
               </div>
-              <div className={flexs({ dir: 'col', gap: '16' })}>
+              <div className="flex items-center flex-col justify-center gap-4">
                 {weekCalendarList.map((week, weekNum) => (
-                  <div key={weekNum} className={clsx(flexs({ justify: 'spb' }), fullwidth)}>
+                  <div key={weekNum} className="flex items-center justify-between w-full">
                     {week.map(day => (
                       <button
                         key={day.date.toString()}
                         type="button"
-                        className={datePickerStyle.date}
+                        className={clsx(
+                          'flex-1 text-center text-base font-medium cursor-pointer w-9 h-9 text-gray-700 rounded-lg',
+                          'hover:bg-gray-50 active:bg-gray-100',
+                          'data-[color300=true]:text-gray-300',
+                          'data-[selected=true]:bg-primary-500 data-[selected=true]:text-white',
+                        )}
                         data-color300={day.nextMonth || day.previousMonth}
                         data-selected={isSameDay(day.date, internalRef.current!.value)}
                         data-holiday={day.holiday.isHoliday}

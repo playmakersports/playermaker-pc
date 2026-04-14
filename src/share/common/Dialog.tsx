@@ -1,7 +1,5 @@
 import type { ComponentProps } from 'react';
 import type { OverlayAsyncControllerComponent, OverlayControllerComponent } from 'overlay-kit';
-import { dialogStyle } from '@/share/common/css/dialog.css.ts';
-import { flexs } from '@/style/container.css.ts';
 import Button from '@/share/components/Button.tsx';
 
 type AlertBaseProps = ComponentProps<OverlayControllerComponent>;
@@ -31,13 +29,16 @@ export const Dialog = (props: DialogProps) => {
 
   if (!isOpen) return null;
   return (
-    <section className={dialogStyle.dim} onClick={type === 'confirm' ? undefined : () => handleClose}>
-      <div className={dialogStyle.container}>
-        <div className={dialogStyle.inner}>
-          <p className={dialogStyle.title}>{title}</p>
-          {contents && <p className={dialogStyle.contents}>{contents}</p>}
+    <section
+      className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-black/50 z-[1000]"
+      onClick={type === 'confirm' ? undefined : () => handleClose}
+    >
+      <div className="flex flex-col gap-8 min-w-[350px] rounded-3xl bg-white p-5 items-stretch">
+        <div className="flex flex-col gap-3 justify-start items-start px-2">
+          <p className="text-lg font-semibold text-gray-700 whitespace-pre-line">{title}</p>
+          {contents && <p className="text-sm font-normal text-gray-700 whitespace-pre-line">{contents}</p>}
         </div>
-        <div className={flexs({ gap: '8' })}>
+        <div className="flex items-center justify-center gap-2">
           {type === 'confirm' && (
             <Button size="large" fillType="light" fullWidth onClick={() => close(false)}>
               취소

@@ -1,6 +1,5 @@
 import NumberFlow, { NumberFlowElement } from '@number-flow/react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { numberFlowStyle } from '@/share/components/css/input.css.ts';
 
 type Props = Partial<Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>> & {
   width?: string | number | 'flexible';
@@ -50,14 +49,14 @@ export const NumberFlowInput = (props: Props & { ref?: React.Ref<HTMLInputElemen
 
   return (
     <div
-      className={numberFlowStyle.flowContainer}
+      className="number-flow-container"
       style={{
         width: width === 'flexible' ? `${calFlexibleWidth()}px` : width,
       }}
     >
       <input
         ref={inputRef}
-        className={numberFlowStyle.flowInternal}
+        className="number-flow-internal"
         style={{
           fontKerning: 'none',
         }}
